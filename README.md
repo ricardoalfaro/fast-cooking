@@ -4,7 +4,7 @@ Una Progressive Web App (PWA) minimalista, responsiva y diseñada específicamen
 
 ---
 
-## 🍳 ¿Para qué sirve? (Para Humanos)
+## 🍳 Propósito y Características
 
 ¿Te ha pasado que quieres cocinar viendo un video de YouTube, pero tienes que estar retrocediendo, buscando los ingredientes en la descripción o tocando la pantalla con las manos sucias porque el celular se suspendió?
 
@@ -17,7 +17,7 @@ Una Progressive Web App (PWA) minimalista, responsiva y diseñada específicamen
 
 ---
 
-## 🛠️ Detalles Técnicos (Para Desarrolladores)
+## 🛠️ Detalles Técnicos
 
 La aplicación está diseñada bajo el principio de simplicidad y portabilidad absoluta. Es un sitio estático autocontenido que se ejecuta en su totalidad en el cliente.
 
