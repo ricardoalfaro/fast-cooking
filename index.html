@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-stone-900 text-stone-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>FastCooking - Recetas Rápidas con Gemini</title>
+  
+  <!-- PWA Meta Tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ea580c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link class="apple-touch-icon" href="icon.svg" rel="apple-touch-icon">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+
+  <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link class="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#fff7ed',
+              100: '#ffedd5',
+              500: '#f97316',
+              600: '#ea580c',
+              700: '#c2410c',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      -webkit-tap-highlight-color: transparent;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .font-display {
+      font-family: 'Outfit', sans-serif;
+    }
+    .ingredient-checkbox:checked + span {
+      text-decoration: line-through;
+      color: #78716c;
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col justify-between antialiased selection:bg-orange-500 selection:text-white pb-safe">
+
+  <!-- App Header / Top Nav bar -->
+  <header class="sticky top-0 z-50 bg-stone-900/90 backdrop-blur-md border-b border-stone-800 px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center space-x-2.5 cursor-pointer" onclick="showHomeScreen()">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      </div>
+      <span class="font-display text-xl font-bold tracking-tight text-white">Fast<span class="text-orange-500">Cooking</span></span>
+    </div>
+    
+    <div class="flex items-center space-x-2">
+      <!-- API Key Setup Button -->
+      <button onclick="openApiKeyModal()" class="p-2 rounded-lg bg-stone-800 border border-stone-700 text-stone-300 active:scale-95 transition-all" title="Configurar API Key de Gemini">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m-2 4a2 2 0 01-2 2m8-10a3 3 0 00-3-3H6a3 3 0 00-3 3v10a3 3 0 003 3h12a3 3 0 003-3V7z" />
+        </svg>
+      </button>
+
+      <!-- Wake Lock Toggle (Kitchen Utility) -->
+      <button id="wakelock-btn" onclick="toggleWakeLock()" class="px-2.5 py-1.5 rounded-lg border border-stone-700 bg-stone-800 text-stone-300 text-xs font-medium flex items-center space-x-1.5 active:scale-95 transition-all" title="Mantener pantalla encendida mientras cocinas">
+        <span id="wakelock-icon" class="w-2 h-2 rounded-full bg-stone-500"></span>
+        <span id="wakelock-text">Pantalla On</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-md w-full mx-auto px-4 py-6 flex flex-col justify-center">
+
+    <!-- PANTALLA DE CARGA (LOADING STATE) -->
+    <section id="screen-loading" class="hidden flex flex-col items-center justify-center min-h-[70vh] text-center space-y-6 animate-fadeIn">
+      <div class="relative w-24 h-24">
+        <div class="absolute inset-0 rounded-full border-4 border-t-orange-500 border-r-transparent border-b-amber-600 border-l-transparent animate-spin"></div>
+        <div class="absolute inset-2 bg-stone-800 rounded-full flex items-center justify-center">
+          <svg class="w-10 h-10 text-orange-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-11.314l.707.707m11.314 11.314l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+          </svg>
+        </div>
+      </div>
+      <div class="space-y-2">
+        <h3 class="font-display text-lg font-bold text-stone-100">Buscando receta con Gemini...</h3>
+        <p id="loading-subtitle" class="text-xs text-stone-400 max-w-xs mx-auto">Conectando con YouTube y extrayendo los datos exactos del video...</p>
+      </div>
+    </section>
+
+    <!-- PANTALLA DE ERROR (ERROR STATE) -->
+    <section id="screen-error" class="hidden flex flex-col items-center justify-center min-h-[70vh] text-center space-y-6 animate-fadeIn">
+      <div class="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-500">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
+      <div class="space-y-2">
+        <h3 class="font-display text-lg font-bold text-stone-100">Ocurrió un problema</h3>
+        <p id="error-message" class="text-xs text-stone-400 max-w-xs mx-auto">No se pudo procesar la receta.</p>
+      </div>
+      <details class="text-left bg-stone-950/60 p-3 rounded-xl max-w-xs w-full border border-stone-800 text-[11px] text-red-400 font-mono">
+        <summary class="cursor-pointer text-stone-400 font-sans font-semibold select-none">Ver detalles técnicos</summary>
+        <div id="error-details" class="mt-2 whitespace-pre-wrap leading-relaxed"></div>
+      </details>
+      <button onclick="showHomeScreen()" class="px-6 py-2.5 rounded-xl bg-orange-600 text-white text-xs font-semibold hover:bg-orange-500 active:scale-95 transition-all shadow-md shadow-orange-600/20">
+        Volver a Intentar
+      </button>
+    </section>
+
+    <!-- 1. PANTALLA DE INICIO (HOME SCREEN) -->
+    <section id="screen-home" class="flex flex-col items-center justify-center min-h-[75vh] text-center space-y-8 animate-fadeIn">
+      
+      <div class="space-y-3">
+        <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-semibold tracking-wide uppercase">
+          <span>⚡ Búsquedas inteligentes con Gemini</span>
+        </div>
+        <h1 class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-stone-100">
+          ¿Qué quieres cocinar hoy?
+        </h1>
+        <p class="text-stone-400 text-sm max-w-xs mx-auto">
+          Busca cualquier receta. Extraeremos los ingredientes y los timestamps exactos de YouTube al instante.
+        </p>
+      </div>
+
+      <!-- Buscador Central -->
+      <form id="search-form" onsubmit="handleSearch(event)" class="w-full space-y-4">
+        <div class="relative group">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-stone-400 group-focus-within:text-orange-500 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <input 
+            type="text" 
+            id="search-input" 
+            placeholder="Ej: Pizza, Empanadas de pino, Sopaipillas..." 
+            autocomplete="off"
+            required
+            class="w-full pl-11 pr-24 py-4 rounded-2xl bg-stone-800 border border-stone-700 text-stone-100 placeholder-stone-500 text-sm sm:text-base focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all shadow-inner"
+          />
+          <button 
+            type="submit" 
+            class="absolute right-2 top-2 bottom-2 px-4 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-medium text-sm flex items-center justify-center active:scale-95 transition-all shadow-md shadow-orange-600/30"
+          >
+            Buscar
+          </button>
+        </div>
+
+        <!-- Chips de sugerencias populares -->
+        <div class="flex flex-wrap items-center justify-center gap-1.5 pt-1">
+          <span class="text-xs text-stone-500 font-medium w-full sm:w-auto mb-1">Populares:</span>
+          <button 
+            type="button" 
+            onclick="quickSearch('pizza')" 
+            class="px-2.5 py-1 rounded-lg bg-stone-800/80 border border-stone-700 hover:border-orange-500/50 text-stone-300 text-xs active:scale-95 transition-all"
+          >
+            🍕 Pizza
+          </button>
+          <button 
+            type="button" 
+            onclick="quickSearch('empanadas de pino')" 
+            class="px-2.5 py-1 rounded-lg bg-stone-800/80 border border-stone-700 hover:border-orange-500/50 text-stone-300 text-xs active:scale-95 transition-all"
+          >
+            🥟 Empanadas
+          </button>
+          <button 
+            type="button" 
+            onclick="quickSearch('puré de garbanzos')" 
+            class="px-2.5 py-1 rounded-lg bg-stone-800/80 border border-stone-700 hover:border-orange-500/50 text-stone-300 text-xs active:scale-95 transition-all"
+          >
+            🧆 Puré Garbanzos
+          </button>
+        </div>
+      </form>
+
+      <!-- SECCIÓN DE FAVORITOS (PERSISTENTE CON LOCALSTORAGE) -->
+      <div id="favorites-section" class="w-full space-y-3 pt-2">
+        <div class="flex items-center justify-between px-1">
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-400/90 flex items-center space-x-1.5">
+            <span>⭐</span>
+            <span>Tus Recetas Favoritas</span>
+          </span>
+          <span id="favs-count" class="text-[11px] font-semibold text-stone-500">0 guardadas</span>
+        </div>
+        
+        <div id="favorites-list" class="flex flex-col gap-2">
+          <!-- Renderizado dinámico de favoritos -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 2. PANTALLA DE RESULTADOS (RESULTS SCREEN) -->
+    <section id="screen-results" class="hidden space-y-6 pb-12 animate-fadeIn">
+
+      <!-- Barra superior de navegación de resultados -->
+      <div class="flex items-center justify-between pt-2">
+        <button 
+          onclick="showHomeScreen()" 
+          class="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-stone-800 border border-stone-700 text-stone-200 text-sm font-medium hover:bg-stone-700 active:scale-95 transition-all shadow-sm"
+        >
+          <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <span>Volver a buscar</span>
+        </button>
+
+        <!-- Botón de Marcar Favorito -->
+        <button 
+          id="fav-toggle-btn"
+          onclick="toggleCurrentFavorite()"
+          class="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-stone-800 border border-stone-700 text-amber-400 text-xs font-semibold hover:bg-stone-700 active:scale-95 transition-all"
+        >
+          <span id="fav-star-icon">☆</span>
+          <span id="fav-star-text">Guardar</span>
+        </button>
+      </div>
+
+      <!-- TARJETA PRINCIPAL (DESTACADA EN NARANJA) -->
+      <article class="rounded-3xl bg-gradient-to-b from-orange-600 via-orange-600 to-amber-700 p-0.5 shadow-2xl shadow-orange-950/40 overflow-hidden">
+        <div class="bg-stone-900 rounded-[23px] p-5 sm:p-6 space-y-6">
+          
+          <!-- Encabezado Receta -->
+          <div class="border-b border-stone-800 pb-5 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-orange-500/20 text-orange-400 text-xs font-bold uppercase tracking-wider border border-orange-500/30">
+                <span class="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"></span>
+                <span>Receta Principal</span>
+              </span>
+              <a 
+                id="main-yt-btn" 
+                href="#" 
+                target="_blank" 
+                rel="noopener"
+                class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-red-600/20 border border-red-500/30 text-red-400 text-xs font-semibold hover:bg-red-600/30 active:scale-95 transition-all"
+              >
+                <svg class="w-4 h-4 fill-current text-red-500" viewBox="0 0 24 24">
+                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                </svg>
+                <span>Ver Video</span>
+              </a>
+            </div>
+            
+            <h2 id="recipe-title" class="font-display text-2xl sm:text-3xl font-extrabold text-stone-100 capitalize">
+              Nombre de Receta
+            </h2>
+            
+            <p id="recipe-author" class="text-sm text-orange-400 font-medium flex items-center space-x-1.5">
+              <span>👨‍🍳</span>
+              <span id="recipe-author-text">Por Álvaro Barrientos Montero</span>
+            </p>
+          </div>
+
+          <!-- SECCIÓN 1: INGREDIENTES -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="font-display text-lg font-bold text-stone-100 flex items-center space-x-2">
+                <span>🛒</span>
+                <span>Ingredientes</span>
+              </h3>
+              <span class="text-xs text-stone-500">Toca para tachar</span>
+            </div>
+
+            <ul id="ingredients-list" class="space-y-2 text-sm text-stone-300">
+              <!-- Renderizado dinámico de ingredientes -->
+            </ul>
+          </div>
+
+          <!-- SECCIÓN 2: TIPS CRUCIALES (CON TIMESTAMPS) -->
+          <div class="space-y-3 pt-2">
+            <h3 class="font-display text-lg font-bold text-stone-100 flex items-center space-x-2">
+              <span>⏱️</span>
+              <span>Tips Cruciales</span>
+            </h3>
+
+            <div id="tips-list" class="space-y-2.5">
+              <!-- Renderizado dinámico de tips con links exactos -->
+            </div>
+          </div>
+
+        </div>
+      </article>
+
+      <!-- SECCIÓN SECUNDARIA: ALTERNATIVAS DE OTROS YOUTUBERS -->
+      <section class="space-y-4 pt-4">
+        <div class="flex items-center space-x-2">
+          <div class="h-4 w-1 bg-stone-600 rounded-full"></div>
+          <h3 class="font-display text-base font-bold text-stone-300 uppercase tracking-wider">
+            Otras alternativas rápidas
+          </h3>
+        </div>
+
+        <div id="alternatives-list" class="space-y-3">
+          <!-- Renderizado dinámico de alternativas -->
+        </div>
+      </section>
+
+    </section>
+
+  </main>
+
+  <!-- MODAL CONFIGURACIÓN API KEY -->
+  <dialog id="apikey-modal" class="rounded-2xl bg-stone-900 border border-stone-800 p-6 text-stone-100 max-w-sm w-full backdrop:bg-stone-950/80 shadow-2xl focus:outline-none">
+    <div class="space-y-4">
+      <div class="flex justify-between items-start">
+        <h3 class="font-display text-lg font-bold text-orange-500 flex items-center space-x-2">
+          <span>🔑</span>
+          <span>Configurar Gemini API</span>
+        </h3>
+        <button onclick="closeApiKeyModal()" class="text-stone-400 hover:text-white text-lg font-bold focus:outline-none">&times;</button>
+      </div>
+      <p class="text-xs text-stone-400 leading-relaxed">
+        Esta app utiliza la API de Gemini con búsqueda integrada para rastrear videos reales en YouTube y extraer la información en tiempo real.
+      </p>
+      
+      <div class="space-y-2">
+        <label for="apikey-input" class="block text-xs font-semibold text-stone-300">Tu API Key de Gemini:</label>
+        <input 
+          type="password" 
+          id="apikey-input" 
+          placeholder="AIzaSy..." 
+          class="w-full px-3 py-2 rounded-xl bg-stone-800 border border-stone-700 text-stone-100 placeholder-stone-600 text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500/20"
+        />
+        <a href="https://aistudio.google.com/" target="_blank" rel="noopener" class="inline-block text-[11px] text-orange-400 hover:underline">
+          Obtén una llave gratis en Google AI Studio ↗
+        </a>
+      </div>
+
+      <div class="flex space-x-3 pt-2">
+        <button onclick="saveApiKey()" class="flex-1 py-2.5 rounded-xl bg-orange-600 text-white font-medium text-xs active:scale-95 transition-all shadow-md shadow-orange-600/20">
+          Guardar Llave
+        </button>
+        <button onclick="closeApiKeyModal()" class="flex-1 py-2.5 rounded-xl bg-stone-800 border border-stone-700 text-stone-300 text-xs hover:bg-stone-700 active:scale-95 transition-all">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Footer minimalista -->
+  <footer class="py-4 text-center text-xs text-stone-600 border-t border-stone-800/60">
+    <p>FastCooking PWA &bull; Diseñado para usar en el celular en la cocina</p>
+  </footer>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    let currentRecipeKey = null;
+
+    // LOCAL STORAGE CONFIGS
+    function getApiKey() {
+      return localStorage.getItem('fastcooking_gemini_key') || '';
+    }
+
+    function saveApiKey() {
+      const key = document.getElementById('apikey-input').value.trim();
+      if (!key) {
+        alert("Por favor ingresa una llave válida.");
+        return;
+      }
+      localStorage.setItem('fastcooking_gemini_key', key);
+      closeApiKeyModal();
+      
+      // Desregistrar Service Worker previo para limpiar caché al configurar nueva clave
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+          for(let reg of registrations) {
+            reg.unregister();
+          }
+        });
+      }
+
+      alert("API Key de Gemini configurada con éxito.");
+      window.location.reload();
+    }
+
+    function openApiKeyModal() {
+      document.getElementById('apikey-input').value = getApiKey();
+      document.getElementById('apikey-modal').showModal();
+    }
+
+    function closeApiKeyModal() {
+      document.getElementById('apikey-modal').close();
+    }
+
+    // FORMATEADOR DE LINKS DE TIMESTAMP ULTRA ROBUSTO
+    function formatYoutubeTimestampLink(baseUrl, seconds) {
+      if (!baseUrl) return '#';
+      
+      // Si la URL es una página de resultados (/results) o canal, no se pueden usar timestamps de video directo
+      if (baseUrl.includes('/results') || baseUrl.includes('/channel') || baseUrl.includes('/c/') || baseUrl.includes('/user/')) {
+        return baseUrl; // Devolver tal cual
+      }
+
+      try {
+        const urlObj = new URL(baseUrl);
+        
+        // Remover cualquier parámetro de tiempo previo
+        urlObj.searchParams.delete('t');
+        
+        // Si es el dominio corto (youtu.be/ID)
+        if (urlObj.hostname === 'youtu.be') {
+          return `${urlObj.origin}${urlObj.pathname}?t=${seconds}s`;
+        }
+        
+        // Si es un dominio watch regular
+        urlObj.searchParams.set('t', `${seconds}s`);
+        return urlObj.toString();
+      } catch (e) {
+        // Fallback básico si falla el objeto URL
+        const separator = baseUrl.includes('?') ? '&' : '?';
+        return `${baseUrl}${separator}t=${seconds}s`;
+      }
+    }
+
+    function getFavorites() {
+      try {
+        const stored = localStorage.getItem('fastcooking_favs');
+        return stored ? JSON.parse(stored) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveFavorites(favs) {
+      try {
+        localStorage.setItem('fastcooking_favs', JSON.stringify(favs));
+      } catch (e) {}
+    }
+
+    function getCustomStoredRecipes() {
+      try {
+        const stored = localStorage.getItem('fastcooking_custom_recipes');
+        return stored ? JSON.parse(stored) : {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveCustomRecipe(recipeObj) {
+      try {
+        const customs = getCustomStoredRecipes();
+        customs[recipeObj.key] = recipeObj;
+        localStorage.setItem('fastcooking_custom_recipes', JSON.stringify(customs));
+      } catch (e) {}
+    }
+
+    function isFavorite(key) {
+      return getFavorites().includes(key);
+    }
+
+    function toggleCurrentFavorite() {
+      if (!currentRecipeKey) return;
+      let favs = getFavorites();
+      if (favs.includes(currentRecipeKey)) {
+        favs = favs.filter(k => k !== currentRecipeKey);
+      } else {
+        favs.push(currentRecipeKey);
+      }
+      saveFavorites(favs);
+      updateFavoriteButtonUI();
+      renderFavoritesList();
+    }
+
+    function updateFavoriteButtonUI() {
+      const btn = document.getElementById('fav-toggle-btn');
+      const icon = document.getElementById('fav-star-icon');
+      const text = document.getElementById('fav-star-text');
+      
+      if (currentRecipeKey && isFavorite(currentRecipeKey)) {
+        icon.textContent = '★';
+        text.textContent = 'Guardada';
+        btn.className = "inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-semibold active:scale-95 transition-all shadow-sm shadow-amber-500/10";
+      } else {
+        icon.textContent = '☆';
+        text.textContent = 'Guardar';
+        btn.className = "inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-stone-800 border border-stone-700 text-amber-400 text-xs font-semibold hover:bg-stone-700 active:scale-95 transition-all";
+      }
+    }
+
+    function renderFavoritesList() {
+      const favs = getFavorites();
+      const listContainer = document.getElementById('favorites-list');
+      const countEl = document.getElementById('favs-count');
+      const customs = getCustomStoredRecipes();
+      
+      countEl.textContent = `${favs.length} ${favs.length === 1 ? 'guardada' : 'guardadas'}`;
+
+      if (favs.length === 0) {
+        listContainer.innerHTML = `
+          <div class="p-3.5 rounded-xl bg-stone-800/40 border border-dashed border-stone-800 text-stone-500 text-xs">
+            Aún no tienes recetas favoritas. Configura tu API Key, busca cualquier plato y guarda.
+          </div>
+        `;
+        return;
+      }
+
+      listContainer.innerHTML = favs.map(key => {
+        const recipe = customs[key];
+        if (!recipe) return '';
+        return `
+          <div 
+            onclick="renderRecipeDirectly('${key}')"
+            class="flex items-center justify-between p-3 rounded-xl bg-stone-800/80 border border-stone-700 hover:border-amber-500/50 cursor-pointer active:scale-[0.98] transition-all group"
+          >
+            <div class="flex items-center space-x-3">
+              <span class="text-base">🍳</span>
+              <div class="text-left">
+                <h4 class="font-display font-bold text-sm text-stone-200 group-hover:text-amber-400 transition-colors">
+                  ${recipe.title}
+                </h4>
+                <p class="text-[11px] text-stone-400">${recipe.author}</p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-amber-400 text-sm">★</span>
+              <span class="text-stone-500 group-hover:text-stone-300 text-xs font-semibold">Ver ➔</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Helper: Normalizar texto
+    function normalizeText(text) {
+      if (!text) return "";
+      return text
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim();
+    }
+
+    // OBTENER EL PRIMER MODELO DISPONIBLE DE MANERA TOTALMENTE DINÁMICA
+    async function fetchFirstActiveModel(apiKey) {
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+        if (response.ok) {
+          const data = await response.json();
+          const activeModels = data.models
+            .filter(m => m.supportedGenerationMethods.includes("generateContent"))
+            .map(m => m.name.replace("models/", ""));
+          
+          if (activeModels.length > 0) {
+            const preferred = activeModels.find(m => m.includes("3.5-flash") || m.includes("3.0-flash") || m.includes("3.5"));
+            return preferred || activeModels[0];
+          }
+        }
+      } catch (e) {
+        console.error("Error al listar modelos dinámicamente:", e);
+      }
+      return "gemini-3.5-flash"; 
+    }
+
+    // LLAMADA A LA API DE GEMINI CON RETRY AUTO-HEALING Y GROUNDING
+    async function callGeminiAPI(apiKey, queryVal, useSearch = true, modelName = "gemini-3.5-flash") {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+
+      const promptText = `Busca el video oficial de YouTube del chef chileno Álvaro Barrientos Montero cocinando la receta de: "${queryVal}".
+Debes extraer la información real del video y formatearla estrictamente como un objeto JSON con los datos exactos del video encontrado.
+
+Estructura requerida:
+{
+  "title": "Nombre de la receta real",
+  "author": "Álvaro Barrientos Montero",
+  "baseUrl": "https://www.youtube.com/watch?v=VIDEO_ID", // URL exacta e individual de reproducción del video de YouTube encontrado. No uses links de búsqueda (/results) ni de canales. Debe ser un link watch de video directo.
+  "ingredients": [
+    "lista de ingredientes reales detallados del video con sus cantidades"
+  ],
+  "tips": [
+    {
+      "timestamp": "[MM:SS]", // El timestamp del video donde ocurre este tip (ej: [02:07])
+      "seconds": 127, // El segundo entero correspondiente a ese timestamp (ej. [02:07] es 127)
+      "text": "Consejo exacto y crucial entregado por el chef en ese segundo"
+    }
+  ],
+  "alternatives": [
+    {
+      "style": "Estilo alternativo de otro YouTuber (ej: Estilo Silvana Cocina)",
+      "diff": "Diferencia principal con el método de Álvaro Barrientos",
+      "tip": "Tip principal de esta alternativa"
+    },
+    {
+      "style": "Estilo alternativo 2 (ej: Estilo Exprés)",
+      "diff": "Diferencia con el plato principal",
+      "tip": "Tip principal de esta segunda alternativa"
+    }
+  ]
+}
+
+REGLAS CRÍTICAS:
+1. La 'baseUrl' DEBE ser estrictamente una URL watch de video de YouTube (ej: https://www.youtube.com/watch?v=wX-y0Y1vJ4E). Está terminantemente prohibido usar enlaces de búsqueda (/results) o de canales.
+2. No inventes ingredientes ni tips. Deben corresponder a la receta del video del chef Álvaro Barrientos.
+3. Los tips con timestamps DEBEN coincidir exactamente con los segundos del video real de YouTube. Calcula los segundos correctamente para armar el link directo (&t=Xs).
+4. Devuelve únicamente el objeto JSON sin envolverlo en bloques de código markdown ni texto adicional.`;
+
+      const requestBody = {
+        contents: [
+          {
+            parts: [{ text: promptText }]
+          }
+        ]
+      };
+
+      if (useSearch) {
+        requestBody.tools = [{ google_search: {} }];
+      }
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`API Error (Status ${response.status}): ${errorText}`);
+      }
+
+      const resData = await response.json();
+      if (!resData.candidates || resData.candidates.length === 0) {
+        throw new Error("La API de Gemini no retornó ningún contenido de respuesta.");
+      }
+
+      return resData.candidates[0].content.parts[0].text;
+    }
+
+    // MANEJO DE BÚSQUEDA GENERAL
+    async function handleSearch(event) {
+      if (event) event.preventDefault();
+      const inputVal = document.getElementById('search-input').value.trim();
+      if (!inputVal) return;
+
+      const apiKey = getApiKey();
+      if (!apiKey) {
+        alert("Por favor, configura tu API Key de Gemini primero haciendo clic en el icono de llave 🔑.");
+        openApiKeyModal();
+        return;
+      }
+
+      showLoadingScreen("Detectando modelos disponibles en tu cuenta...");
+
+      const detectedModel = await fetchFirstActiveModel(apiKey);
+      const modelsToTry = [detectedModel, "gemini-3.5-flash", "gemini-3.5-flash-latest", "gemini-3.0-flash"];
+      
+      let success = false;
+      let geminiText = "";
+      let lastError = null;
+
+      for (const model of modelsToTry) {
+        if (success) break;
+
+        // Intento A: Con herramienta de búsqueda
+        try {
+          showLoadingScreen(`Buscando con ${model} y YouTube...`);
+          geminiText = await callGeminiAPI(apiKey, inputVal, true, model);
+          success = true;
+          break;
+        } catch (searchError) {
+          console.warn(`Fallo con ${model} y google_search:`, searchError);
+          lastError = searchError;
+
+          if (searchError.message.includes("404") || searchError.message.includes("NOT_FOUND") || searchError.message.includes("no longer available")) {
+            continue;
+          }
+        }
+
+        // Intento B: Sin herramienta de búsqueda
+        try {
+          showLoadingScreen(`Consultando con ${model} directamente...`);
+          geminiText = await callGeminiAPI(apiKey, inputVal, false, model);
+          success = true;
+          break;
+        } catch (noSearchError) {
+          console.warn(`Fallo con ${model} sin búsqueda:`, noSearchError);
+          lastError = noSearchError;
+        }
+      }
+
+      if (!success) {
+        showErrorScreen(
+          lastError ? lastError.message : "No se pudo conectar con ningún modelo de Gemini.",
+          lastError ? (lastError.text || lastError.message || "Sin detalles técnicos.") : ""
+        );
+        return;
+      }
+
+      try {
+        const jsonRegex = /\{[\s\S]*\}/;
+        const match = geminiText.match(jsonRegex);
+        if (!match) {
+          throw new Error("La respuesta del modelo no contiene un objeto JSON legible.\n\nContenido crudo:\n" + geminiText);
+        }
+
+        const recipeData = JSON.parse(match[0]);
+        recipeData.key = normalizeText(inputVal);
+
+        // Guardar receta en cache local
+        saveCustomRecipe(recipeData);
+
+        // Mostrar la Receta
+        renderRecipeUI(recipeData);
+
+      } catch (err) {
+        console.error(err);
+        showErrorScreen(err.message, err.stack || "");
+      }
+    }
+
+    function quickSearch(queryText) {
+      document.getElementById('search-input').value = queryText;
+      handleSearch();
+    }
+
+    function renderRecipeDirectly(key) {
+      const customs = getCustomStoredRecipes();
+      const recipe = customs[key];
+      if (recipe) {
+        renderRecipeUI(recipe);
+      }
+    }
+
+    // RENDERIZAR RECETA EN PANTALLA
+    function renderRecipeUI(data) {
+      hideLoadingScreen();
+      
+      currentRecipeKey = data.key;
+
+      // Actualizar datos Principales
+      document.getElementById('recipe-title').textContent = data.title;
+      document.getElementById('recipe-author-text').textContent = `Por ${data.author}`;
+      document.getElementById('main-yt-btn').href = data.baseUrl;
+
+      updateFavoriteButtonUI();
+
+      // Renderizar Ingredientes con Checkboxes
+      const ingredientsContainer = document.getElementById('ingredients-list');
+      ingredientsContainer.innerHTML = data.ingredients.map((ing, idx) => `
+        <li class="flex items-start space-x-3 p-2.5 rounded-xl bg-stone-800/60 border border-stone-800 hover:border-stone-700 transition-colors cursor-pointer">
+          <input 
+            type="checkbox" 
+            id="ing-${idx}" 
+            class="ingredient-checkbox mt-0.5 w-4 h-4 rounded border-stone-600 text-orange-600 focus:ring-orange-500 focus:ring-offset-stone-900 bg-stone-700"
+          />
+          <label for="ing-${idx}" class="cursor-pointer select-none text-stone-200 flex-1 text-xs sm:text-sm">
+            <span>${ing}</span>
+          </label>
+        </li>
+      `).join('');
+
+      // Renderizar Tips con Links exactos (&t=X)
+      const tipsContainer = document.getElementById('tips-list');
+      tipsContainer.innerHTML = data.tips.map(tip => {
+        // Formatear correctamente la URL con el timestamp en segundos
+        const ytTimeLink = formatYoutubeTimestampLink(data.baseUrl, tip.seconds);
+        
+        return `
+          <a 
+            href="${ytTimeLink}" 
+            target="_blank" 
+            rel="noopener"
+            class="group block p-3 rounded-xl bg-stone-800/80 border border-stone-700/80 hover:border-orange-500/60 hover:bg-stone-800 active:scale-[0.98] transition-all"
+          >
+            <div class="flex items-start space-x-3">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-md bg-orange-500/20 text-orange-400 font-mono text-xs font-bold border border-orange-500/30 group-hover:bg-orange-500 group-hover:text-white transition-colors shrink-0">
+                ${tip.timestamp} ↗
+              </span>
+              <p class="text-xs sm:text-sm text-stone-200 group-hover:text-white transition-colors leading-relaxed">
+                ${tip.text}
+              </p>
+            </div>
+          </a>
+        `;
+      }).join('');
+
+      // Renderizar Alternativas
+      const alternativesContainer = document.getElementById('alternatives-list');
+      alternativesContainer.innerHTML = data.alternatives.map(alt => `
+        <div class="p-4 rounded-2xl bg-stone-800/50 border border-stone-800 space-y-2">
+          <h4 class="font-display text-sm font-bold text-stone-200">
+            ${alt.style}
+          </h4>
+          <p class="text-xs text-stone-400 leading-relaxed">
+            <strong class="text-stone-300 font-medium">Diferencia clave:</strong> ${alt.diff}
+          </p>
+          <p class="text-xs text-orange-400/90 leading-relaxed pt-1">
+            <strong class="font-semibold text-orange-400">💡 Tip principal:</strong> ${alt.tip}
+          </p>
+        </div>
+      `).join('');
+
+      // Cambiar a pantalla de resultados
+      document.getElementById('screen-home').classList.add('hidden');
+      document.getElementById('screen-results').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showHomeScreen() {
+      document.getElementById('screen-results').classList.add('hidden');
+      document.getElementById('screen-loading').classList.add('hidden');
+      document.getElementById('screen-error').classList.add('hidden');
+      document.getElementById('screen-home').classList.remove('hidden');
+      renderFavoritesList();
+      document.getElementById('search-input').focus();
+    }
+
+    function showLoadingScreen(text) {
+      document.getElementById('screen-home').classList.add('hidden');
+      document.getElementById('screen-results').classList.add('hidden');
+      document.getElementById('screen-error').classList.add('hidden');
+      document.getElementById('screen-loading').classList.remove('hidden');
+      if (text) {
+        document.getElementById('loading-subtitle').textContent = text;
+      }
+    }
+
+    function hideLoadingScreen() {
+      document.getElementById('screen-loading').classList.add('hidden');
+    }
+
+    function showErrorScreen(message, details) {
+      document.getElementById('screen-home').classList.add('hidden');
+      document.getElementById('screen-results').classList.add('hidden');
+      document.getElementById('screen-loading').classList.add('hidden');
+      document.getElementById('screen-error').classList.remove('hidden');
+      document.getElementById('error-message').textContent = message;
+      document.getElementById('error-details').textContent = details;
+    }
+
+    // Wake Lock API
+    let wakeLock = null;
+    async function toggleWakeLock() {
+      const icon = document.getElementById('wakelock-icon');
+      const text = document.getElementById('wakelock-text');
+      
+      if (!('wakeLock' in navigator)) {
+        alert('Tu navegador no soporta Wake Lock API.');
+        return;
+      }
+
+      try {
+        if (wakeLock !== null) {
+          await wakeLock.release();
+          wakeLock = null;
+          icon.className = "w-2 h-2 rounded-full bg-stone-500";
+          text.textContent = "Pantalla On";
+        } else {
+          wakeLock = await navigator.wakeLock.request('screen');
+          icon.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+          text.textContent = "Activo";
+        }
+      } catch (err) {
+        console.error(`Wake Lock Error: ${err.message}`);
+      }
+    }
+
+    // Service Worker PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => {
+            console.log('Service Worker registrado:', reg.scope);
+            reg.update();
+          })
+          .catch(err => console.log('Error de Service Worker:', err));
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderFavoritesList();
+    });
+  </script>
+</body>
+</html>
