@@ -7,13 +7,13 @@
   
   <!-- PWA Meta Tags -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#FF6B4A">
+  <meta name="theme-color" content="#8E97FD">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link class="apple-touch-icon" href="icon.svg" rel="apple-touch-icon">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
 
-  <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
+  <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -30,30 +30,35 @@
             display: ['Outfit', 'sans-serif'],
           },
           colors: {
-            brand: {
-              50: '#fff4f0',
-              100: '#ffe6dc',
-              400: '#ff8a65',
-              500: '#ff6b4a',
-              600: '#e64a19',
-              700: '#d84315',
-            },
-            accent: {
+            moon: {
               purple: '#8E97FD',
+              purpleLight: '#E6E9FF',
+              purpleDark: '#1E2442',
               peach: '#FFAB91',
-              mint: '#81C784',
-              cream: '#FFF8E1',
+              peachLight: '#FFEBE6',
+              sage: '#81C784',
+              sageLight: '#E8F5E9',
+              amber: '#FFCA28',
+              amberLight: '#FFF8E1',
+              darkBg: '#0C0F1D',
+              darkCard: '#181C33',
+              lightBg: '#FAF9F5',
+              lightCard: '#FFFFFF',
             }
           },
           animation: {
             'steam-wave': 'steam 2s ease-in-out infinite',
             'pulse-subtle': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'spin-slow': 'spin 8s linear infinite',
+            'float': 'float 4s ease-in-out infinite',
           },
           keyframes: {
             steam: {
-              '0%, 100%': { transform: 'translateY(0) scaleX(1)', opacity: '0.4' },
-              '50%': { transform: 'translateY(-6px) scaleX(1.15)', opacity: '0.9' },
+              '0%, 100%': { transform: 'translateY(0) scaleX(1)', opacity: '0.3' },
+              '50%': { transform: 'translateY(-8px) scaleX(1.2)', opacity: '0.9' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-6px)' },
             }
           }
         }
@@ -65,67 +70,71 @@
     body {
       -webkit-tap-highlight-color: transparent;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      transition: background-color 0.3s ease, color 0.3s ease;
+      transition: background-color 0.35s ease, color 0.35s ease;
     }
     .font-display {
       font-family: 'Outfit', sans-serif;
     }
-    .ingredient-checkbox:checked + span {
+    .ingredient-checkbox:checked + label span {
       text-decoration: line-through;
-      opacity: 0.5;
+      opacity: 0.45;
     }
-    /* Estilos base de temas */
+    /* Estilos base de temas inspirados en Silent Moon */
     html.dark {
-      background-color: #0B0E1B;
+      background-color: #0C0F1D;
       color: #F5F6FA;
     }
     html.light {
-      background-color: #F8F9FE;
-      color: #1E202C;
+      background-color: #FAF9F5;
+      color: #1A1D2E;
     }
   </style>
 </head>
-<body class="h-full flex flex-col justify-between antialiased selection:bg-brand-500 selection:text-white pb-safe pt-safe">
+<body class="h-full flex flex-col justify-between antialiased selection:bg-moon-purple selection:text-white pb-safe pt-safe">
 
   <!-- Pull to Refresh Indicator -->
   <div id="pull-to-refresh" class="fixed top-0 left-0 right-0 z-50 flex items-center justify-center pointer-events-none transition-all duration-100 ease-out -translate-y-16 opacity-0">
-    <div class="bg-white/90 dark:bg-stone-800/90 backdrop-blur-md border border-stone-200 dark:border-stone-700 px-4 py-2 rounded-full shadow-xl flex items-center space-x-2 text-stone-700 dark:text-stone-200 text-xs font-semibold">
-      <svg id="pull-spinner" class="w-4 h-4 text-brand-500 animate-spin hidden" fill="none" viewBox="0 0 24 24">
+    <div class="bg-white/90 dark:bg-[#181C33]/90 backdrop-blur-md border border-stone-200 dark:border-stone-800 px-4 py-2 rounded-full shadow-2xl flex items-center space-x-2 text-stone-700 dark:text-stone-200 text-xs font-semibold">
+      <svg id="pull-spinner" class="w-4 h-4 text-moon-purple animate-spin hidden" fill="none" viewBox="0 0 24 24">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
       </svg>
-      <span id="pull-arrow" class="text-brand-500 text-sm font-bold transition-transform duration-200">↓</span>
+      <span id="pull-arrow" class="text-moon-purple text-sm font-bold transition-transform duration-200">↓</span>
       <span id="pull-text">Desliza para actualizar</span>
     </div>
   </div>
 
-  <!-- App Header / Top Nav bar -->
-  <header class="sticky top-0 z-50 bg-white/80 dark:bg-[#0B0E1B]/80 backdrop-blur-md border-b border-stone-200/60 dark:border-stone-800/60 px-4 pt-[calc(env(safe-area-inset-top)+12px)] pb-3 flex items-center justify-between transition-colors">
+  <!-- Header Estilo Silent Moon -->
+  <header class="sticky top-0 z-50 bg-white/80 dark:bg-[#0C0F1D]/80 backdrop-blur-xl border-b border-stone-200/50 dark:border-stone-800/50 px-4 pt-[calc(env(safe-area-inset-top)+10px)] pb-3 flex items-center justify-between transition-colors">
     <div class="flex items-center space-x-2.5 cursor-pointer group" onclick="showHomeScreen()">
-      <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-500 to-brand-400 flex items-center justify-center shadow-lg shadow-brand-500/25 group-active:scale-95 transition-transform">
+      <div class="w-10 h-10 rounded-2xl bg-moon-purple text-white flex items-center justify-center shadow-lg shadow-moon-purple/30 group-active:scale-95 transition-transform">
         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg>
       </div>
-      <span class="font-display text-xl font-extrabold tracking-tight text-stone-900 dark:text-white">Fast<span class="text-brand-500">Cooking</span></span>
+      <div class="flex flex-col">
+        <span class="font-display text-xl font-extrabold tracking-tight text-stone-900 dark:text-white leading-none">Fast<span class="text-moon-purple">Cooking</span></span>
+        <span class="text-[10px] font-semibold text-stone-400 dark:text-stone-500 tracking-wider">GEMINI 3.6 FLASH</span>
+      </div>
     </div>
     
     <div class="flex items-center space-x-2">
-      <!-- Theme Toggle Button (Light / Dark) -->
-      <button id="theme-toggle-btn" onclick="toggleTheme()" class="w-9 h-9 rounded-2xl border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-800/70 text-stone-700 dark:text-amber-300 flex items-center justify-center active:scale-90 transition-all shadow-sm" title="Cambiar tema">
-        <span id="theme-icon" class="text-base">🌙</span>
+      <!-- Theme Switcher Pill -->
+      <button id="theme-toggle-btn" onclick="toggleTheme()" class="h-9 px-3 rounded-full border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-[#181C33] text-stone-700 dark:text-amber-300 text-xs font-bold flex items-center space-x-1.5 active:scale-95 transition-all shadow-sm">
+        <span id="theme-icon">🌙</span>
+        <span id="theme-text" class="hidden xs:inline text-[11px] font-semibold">Tema</span>
       </button>
 
       <!-- API Key Setup Button -->
-      <button onclick="openApiKeyModal()" class="px-3 py-1.5 rounded-2xl border border-brand-500/30 bg-brand-500/10 text-brand-600 dark:text-brand-400 text-xs font-bold flex items-center space-x-1.5 active:scale-95 transition-all" title="Configurar API Key de Gemini">
+      <button onclick="openApiKeyModal()" class="h-9 px-3 rounded-full border border-moon-purple/30 bg-moon-purple/10 text-moon-purple text-xs font-bold flex items-center space-x-1 active:scale-95 transition-all">
         <span>🔑</span>
         <span class="hidden xs:inline">API Key</span>
       </button>
 
-      <!-- Wake Lock Toggle (Kitchen Utility) -->
-      <button id="wakelock-btn" onclick="toggleWakeLock()" class="px-3 py-1.5 rounded-2xl border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-800/70 text-stone-700 dark:text-stone-300 text-xs font-semibold flex items-center space-x-1.5 active:scale-95 transition-all shadow-sm" title="Mantener pantalla encendida mientras cocinas">
+      <!-- Wake Lock Toggle -->
+      <button id="wakelock-btn" onclick="toggleWakeLock()" class="h-9 px-3 rounded-full border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-[#181C33] text-stone-700 dark:text-stone-300 text-xs font-semibold flex items-center space-x-1.5 active:scale-95 transition-all shadow-sm">
         <span id="wakelock-icon" class="w-2 h-2 rounded-full bg-stone-400 dark:bg-stone-500"></span>
-        <span id="wakelock-text">Pantalla On</span>
+        <span id="wakelock-text" class="hidden xs:inline">Pantalla On</span>
       </button>
     </div>
   </header>
@@ -133,37 +142,37 @@
   <!-- MAIN CONTAINER -->
   <main class="flex-1 max-w-md w-full mx-auto px-4 py-6 flex flex-col justify-center">
 
-    <!-- PANTALLA DE CARGA (NOUN PROJECT MINIMALIST LOADER) -->
-    <section id="screen-loading" class="hidden flex flex-col items-center justify-center min-h-[65vh] text-center space-y-7 animate-fadeIn">
+    <!-- PANTALLA DE CARGA (NOUN PROJECT LOADER ARTWORK) -->
+    <section id="screen-loading" class="hidden flex flex-col items-center justify-center min-h-[68vh] text-center space-y-7 animate-fadeIn">
       
       <!-- Card Carga Estilo Noun Project Minimalista -->
-      <div class="relative w-36 h-36 flex items-center justify-center">
-        <!-- Glow suave de fondo -->
-        <div class="absolute inset-0 rounded-full bg-brand-500/10 dark:bg-brand-500/15 animate-ping opacity-30"></div>
+      <div class="relative w-40 h-40 flex items-center justify-center">
+        <!-- Aura pulsante exterior -->
+        <div class="absolute inset-0 rounded-[36px] bg-moon-purple/15 dark:bg-moon-purple/20 animate-ping opacity-25"></div>
         
-        <!-- Contenedor del Icono Noun Project -->
-        <div class="relative w-32 h-32 rounded-3xl bg-white dark:bg-[#161B33] border border-stone-200/80 dark:border-stone-800 shadow-xl flex flex-col items-center justify-center p-4">
+        <!-- Tarjeta del Icono Noun Project -->
+        <div class="relative w-36 h-36 rounded-[32px] bg-white dark:bg-[#181C33] border border-stone-200/80 dark:border-stone-800 shadow-2xl flex flex-col items-center justify-center p-4">
           
-          <!-- Minimalist Steam Waves (Animated SVG) -->
-          <div class="flex items-center space-x-1.5 mb-1">
-            <svg class="w-2.5 h-4 text-brand-500 animate-steam-wave" fill="none" stroke="currentColor" viewBox="0 0 10 20">
+          <!-- Vapor Animado Noun Project Line Art -->
+          <div class="flex items-center space-x-2 mb-1.5">
+            <svg class="w-3 h-5 text-moon-purple animate-steam-wave" fill="none" stroke="currentColor" viewBox="0 0 10 20">
               <path stroke-linecap="round" stroke-width="2" d="M5 2c-3 4 3 6 0 10s3 6 0 8"/>
             </svg>
-            <svg class="w-2.5 h-4 text-brand-400 animate-steam-wave" style="animation-delay: 0.3s;" fill="none" stroke="currentColor" viewBox="0 0 10 20">
+            <svg class="w-3 h-5 text-moon-peach animate-steam-wave" style="animation-delay: 0.4s;" fill="none" stroke="currentColor" viewBox="0 0 10 20">
               <path stroke-linecap="round" stroke-width="2" d="M5 2c-3 4 3 6 0 10s3 6 0 8"/>
             </svg>
-            <svg class="w-2.5 h-4 text-brand-500 animate-steam-wave" style="animation-delay: 0.6s;" fill="none" stroke="currentColor" viewBox="0 0 10 20">
+            <svg class="w-3 h-5 text-moon-purple animate-steam-wave" style="animation-delay: 0.8s;" fill="none" stroke="currentColor" viewBox="0 0 10 20">
               <path stroke-linecap="round" stroke-width="2" d="M5 2c-3 4 3 6 0 10s3 6 0 8"/>
             </svg>
           </div>
 
-          <!-- Noun Project Signature Line-Art Culinary Icon (Olla / Pan Minimalista) -->
-          <svg class="w-14 h-14 text-stone-800 dark:text-white" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24">
-            <!-- Tapa de olla minimalista -->
+          <!-- Icono Olla Minimalista Noun Project -->
+          <svg class="w-16 h-16 text-stone-800 dark:text-white" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" viewBox="0 0 24 24">
+            <!-- Tapa de la olla -->
             <path d="M7 9h10"/>
             <path d="M12 7v2"/>
             <path d="M10 7a2 2 0 014 0"/>
-            <!-- Cuerpo de olla con asas -->
+            <!-- Cuerpo y asas de la olla -->
             <path d="M5 10h14a1 1 0 011 1v5a4 4 0 01-4 4H8a4 4 0 01-4-4v-5a1 1 0 011-1z"/>
             <path d="M2 12h2"/>
             <path d="M20 12h2"/>
@@ -171,22 +180,22 @@
         </div>
       </div>
 
-      <div class="space-y-2.5 max-w-xs mx-auto">
-        <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-brand-500/10 text-brand-600 dark:text-brand-400 text-xs font-bold uppercase tracking-wider">
-          <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
+      <div class="space-y-3 max-w-xs mx-auto">
+        <span class="inline-flex items-center space-x-1.5 px-3.5 py-1 rounded-full bg-moon-purple/10 text-moon-purple text-xs font-bold uppercase tracking-wider">
+          <span class="w-2 h-2 rounded-full bg-moon-purple animate-pulse"></span>
           <span>Gemini 3.6 Flash</span>
         </span>
-        <h3 class="font-display text-xl font-extrabold text-stone-900 dark:text-white tracking-tight">Buscando receta exacta...</h3>
-        <p id="loading-subtitle" class="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">Conectando con YouTube y extrayendo los ingredientes y timestamps del chef Álvaro Barrientos...</p>
+        <h3 class="font-display text-2xl font-extrabold text-stone-900 dark:text-white tracking-tight">Buscando receta exacta...</h3>
+        <p id="loading-subtitle" class="text-xs text-stone-500 dark:text-stone-400 leading-relaxed font-medium">Conectando con YouTube y extrayendo los ingredientes y timestamps del chef Álvaro Barrientos...</p>
       </div>
 
-      <!-- Barra de progreso minimalista -->
-      <div class="w-48 h-1.5 rounded-full bg-stone-200 dark:bg-stone-800 overflow-hidden">
-        <div class="h-full bg-gradient-to-r from-brand-500 to-amber-500 rounded-full w-2/3 animate-pulse"></div>
+      <!-- Barra de progreso con gradiente Silent Moon -->
+      <div class="w-52 h-2 rounded-full bg-stone-200 dark:bg-stone-800 overflow-hidden shadow-inner">
+        <div class="h-full bg-gradient-to-r from-moon-purple to-moon-peach rounded-full w-3/4 animate-pulse"></div>
       </div>
     </section>
 
-    <!-- PANTALLA DE ERROR (ERROR STATE) -->
+    <!-- PANTALLA DE ERROR -->
     <section id="screen-error" class="hidden flex flex-col items-center justify-center min-h-[65vh] text-center space-y-6 animate-fadeIn">
       <div class="w-16 h-16 rounded-3xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500">
         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -197,35 +206,34 @@
         <h3 class="font-display text-xl font-extrabold text-stone-900 dark:text-white">Ocurrió un problema</h3>
         <p id="error-message" class="text-xs text-stone-500 dark:text-stone-400 max-w-xs mx-auto">No se pudo procesar la receta.</p>
       </div>
-      <details class="text-left bg-stone-100 dark:bg-stone-900 p-3.5 rounded-2xl max-w-xs w-full border border-stone-200 dark:border-stone-800 text-[11px] text-red-500 dark:text-red-400 font-mono">
+      <details class="text-left bg-stone-100 dark:bg-[#181C33] p-4 rounded-2xl max-w-xs w-full border border-stone-200 dark:border-stone-800 text-[11px] text-red-500 dark:text-red-400 font-mono">
         <summary class="cursor-pointer text-stone-600 dark:text-stone-400 font-sans font-semibold select-none">Ver detalles técnicos</summary>
         <div id="error-details" class="mt-2 whitespace-pre-wrap leading-relaxed"></div>
       </details>
-      <button onclick="showHomeScreen()" class="px-7 py-3 rounded-full bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold active:scale-95 transition-all shadow-lg shadow-brand-500/25">
+      <button onclick="showHomeScreen()" class="px-8 py-3 rounded-full bg-moon-purple hover:bg-moon-purple/90 text-white text-xs font-bold active:scale-95 transition-all shadow-lg shadow-moon-purple/30">
         Volver a Intentar
       </button>
     </section>
 
-    <!-- 1. PANTALLA DE INICIO (HOME SCREEN - SILENT MOON STYLE) -->
-    <section id="screen-home" class="flex flex-col items-center justify-center min-h-[72vh] text-center space-y-7 animate-fadeIn">
+    <!-- 1. PANTALLA DE INICIO (SILENT MOON STYLE DASHBOARD) -->
+    <section id="screen-home" class="flex flex-col min-h-[75vh] space-y-7 animate-fadeIn">
       
-      <!-- Encabezado de Bienvenida -->
-      <div class="space-y-3 pt-2">
-        <div class="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-brand-500/10 text-brand-600 dark:text-brand-400 text-xs font-bold tracking-wide uppercase">
-          <span>🍳 ¡Hola, Chef!</span>
+      <!-- Greeting Header Dinámico (Good Morning / Good Evening) -->
+      <div class="space-y-2 pt-1 text-left">
+        <div class="flex items-center justify-between">
+          <h2 id="greeting-title" class="font-display text-3xl sm:text-4xl font-extrabold text-stone-900 dark:text-white tracking-tight">
+            ¡Buenas tardes, Chef! 🍳
+          </h2>
         </div>
-        <h1 class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-stone-900 dark:text-white">
-          ¿Qué quieres cocinar hoy?
-        </h1>
-        <p class="text-stone-500 dark:text-stone-400 text-xs sm:text-sm max-w-xs mx-auto leading-relaxed">
-          Busca cualquier plato. Gemini extraerá los ingredientes y los timestamps exactos de YouTube al instante.
+        <p class="text-stone-500 dark:text-stone-400 text-xs sm:text-sm font-medium">
+          ¿Qué quieres cocinar hoy? Gemini buscará la receta oficial en YouTube.
         </p>
       </div>
 
       <!-- Buscador Central Minimalista -->
       <form id="search-form" onsubmit="handleSearch(event)" class="w-full space-y-4">
         <div class="relative group">
-          <div class="absolute inset-y-0 left-0 pl-4.5 flex items-center pointer-events-none text-stone-400 group-focus-within:text-brand-500 transition-colors">
+          <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-stone-400 group-focus-within:text-moon-purple transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
@@ -236,54 +244,91 @@
             placeholder="Ej: Pizza, Empanadas de pino, Sopaipillas..." 
             autocomplete="off"
             required
-            class="w-full pl-12 pr-28 py-4 rounded-full bg-white dark:bg-[#161B33] border border-stone-200 dark:border-stone-800 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-stone-500 text-sm sm:text-base focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 transition-all shadow-md dark:shadow-none"
+            class="w-full pl-13 pr-28 py-4.5 rounded-full bg-white dark:bg-[#181C33] border border-stone-200/80 dark:border-stone-800 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-stone-500 text-sm sm:text-base focus:outline-none focus:border-moon-purple focus:ring-4 focus:ring-moon-purple/20 transition-all shadow-md dark:shadow-none"
           />
           <button 
             type="submit" 
-            class="absolute right-2 top-2 bottom-2 px-5 rounded-full bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs sm:text-sm flex items-center justify-center active:scale-95 transition-all shadow-md shadow-brand-500/30"
+            class="absolute right-2 top-2 bottom-2 px-5 rounded-full bg-moon-purple hover:bg-moon-purple/90 text-white font-bold text-xs sm:text-sm flex items-center justify-center active:scale-95 transition-all shadow-md shadow-moon-purple/30"
           >
             Buscar
           </button>
         </div>
-
-        <!-- Chips de sugerencias populares (Estilo Pastel Silent Moon) -->
-        <div class="flex flex-wrap items-center justify-center gap-2 pt-1">
-          <span class="text-xs text-stone-400 dark:text-stone-500 font-semibold w-full sm:w-auto mb-0.5">Sugerencias:</span>
-          <button 
-            type="button" 
-            onclick="quickSearch('pizza')" 
-            class="px-3.5 py-1.5 rounded-full bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/20 text-amber-700 dark:text-amber-300 text-xs font-semibold active:scale-95 transition-all hover:bg-amber-500/20"
-          >
-            🍕 Pizza
-          </button>
-          <button 
-            type="button" 
-            onclick="quickSearch('empanadas de pino')" 
-            class="px-3.5 py-1.5 rounded-full bg-orange-500/10 dark:bg-orange-500/15 border border-orange-500/20 text-orange-700 dark:text-orange-300 text-xs font-semibold active:scale-95 transition-all hover:bg-orange-500/20"
-          >
-            🥟 Empanadas
-          </button>
-          <button 
-            type="button" 
-            onclick="quickSearch('puré de garbanzos')" 
-            class="px-3.5 py-1.5 rounded-full bg-indigo-500/10 dark:bg-indigo-500/15 border border-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-xs font-semibold active:scale-95 transition-all hover:bg-indigo-500/20"
-          >
-            🧆 Puré Garbanzos
-          </button>
-          <button 
-            type="button" 
-            onclick="quickSearch('cazuela de ave')" 
-            class="px-3.5 py-1.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs font-semibold active:scale-95 transition-all hover:bg-emerald-500/20"
-          >
-            🍲 Cazuela
-          </button>
-        </div>
       </form>
 
-      <!-- SECCIÓN DE FAVORITOS (CARDS MINIMALISTAS) -->
-      <div id="favorites-section" class="w-full space-y-3 pt-3">
+      <!-- GRID DE CATEGORÍAS EN TONOS PASTEL (SILENT MOON DESIGN SYSTEM) -->
+      <div class="space-y-3">
         <div class="flex items-center justify-between px-1">
-          <span class="text-xs font-extrabold uppercase tracking-wider text-stone-500 dark:text-stone-400 flex items-center space-x-1.5">
+          <span class="text-xs font-extrabold uppercase tracking-wider text-stone-400 dark:text-stone-500">Categorías rápidas</span>
+          <span class="text-[11px] font-semibold text-moon-purple">Álvaro Barrientos</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <!-- Card 1: Pizzas & Masas (Pastel Peach) -->
+          <div 
+            onclick="quickSearch('pizza')"
+            class="group p-4 rounded-[28px] bg-[#FFEBE6] dark:bg-[#251A22] border border-orange-200/60 dark:border-orange-500/20 cursor-pointer active:scale-95 transition-all flex flex-col justify-between h-32 relative overflow-hidden"
+          >
+            <div class="flex justify-between items-start">
+              <span class="text-2xl">🍕</span>
+              <span class="px-2.5 py-1 rounded-full bg-white/80 dark:bg-stone-900/80 text-[10px] font-extrabold text-orange-600 dark:text-orange-300 uppercase tracking-wider">Masa</span>
+            </div>
+            <div>
+              <h4 class="font-display font-extrabold text-base text-stone-900 dark:text-white leading-tight">Pizza Italiana</h4>
+              <p class="text-[11px] text-stone-600 dark:text-stone-400 font-medium pt-0.5">Receta crujiente</p>
+            </div>
+          </div>
+
+          <!-- Card 2: Empanadas (Pastel Periwinkle) -->
+          <div 
+            onclick="quickSearch('empanadas de pino')"
+            class="group p-4 rounded-[28px] bg-[#E8EAFF] dark:bg-[#1C203B] border border-indigo-200/60 dark:border-indigo-500/20 cursor-pointer active:scale-95 transition-all flex flex-col justify-between h-32 relative overflow-hidden"
+          >
+            <div class="flex justify-between items-start">
+              <span class="text-2xl">🥟</span>
+              <span class="px-2.5 py-1 rounded-full bg-white/80 dark:bg-stone-900/80 text-[10px] font-extrabold text-moon-purple uppercase tracking-wider">Clásico</span>
+            </div>
+            <div>
+              <h4 class="font-display font-extrabold text-base text-stone-900 dark:text-white leading-tight">Empanadas Pino</h4>
+              <p class="text-[11px] text-stone-600 dark:text-stone-400 font-medium pt-0.5">Al horno chileno</p>
+            </div>
+          </div>
+
+          <!-- Card 3: Legumbres & Fit (Pastel Sage Green) -->
+          <div 
+            onclick="quickSearch('puré de garbanzos')"
+            class="group p-4 rounded-[28px] bg-[#E8F5E9] dark:bg-[#182822] border border-emerald-200/60 dark:border-emerald-500/20 cursor-pointer active:scale-95 transition-all flex flex-col justify-between h-32 relative overflow-hidden"
+          >
+            <div class="flex justify-between items-start">
+              <span class="text-2xl">🧆</span>
+              <span class="px-2.5 py-1 rounded-full bg-white/80 dark:bg-stone-900/80 text-[10px] font-extrabold text-emerald-600 dark:text-emerald-300 uppercase tracking-wider">Sano</span>
+            </div>
+            <div>
+              <h4 class="font-display font-extrabold text-base text-stone-900 dark:text-white leading-tight">Puré Garbanzos</h4>
+              <p class="text-[11px] text-stone-600 dark:text-stone-400 font-medium pt-0.5">Hummus suave</p>
+            </div>
+          </div>
+
+          <!-- Card 4: Sopas & Guisos (Pastel Warm Amber) -->
+          <div 
+            onclick="quickSearch('cazuela de ave')"
+            class="group p-4 rounded-[28px] bg-[#FFF8E1] dark:bg-[#2A261A] border border-amber-200/60 dark:border-amber-500/20 cursor-pointer active:scale-95 transition-all flex flex-col justify-between h-32 relative overflow-hidden"
+          >
+            <div class="flex justify-between items-start">
+              <span class="text-2xl">🍲</span>
+              <span class="px-2.5 py-1 rounded-full bg-white/80 dark:bg-stone-900/80 text-[10px] font-extrabold text-amber-700 dark:text-amber-300 uppercase tracking-wider">Caliente</span>
+            </div>
+            <div>
+              <h4 class="font-display font-extrabold text-base text-stone-900 dark:text-white leading-tight">Cazuela de Ave</h4>
+              <p class="text-[11px] text-stone-600 dark:text-stone-400 font-medium pt-0.5">Sabor hogareño</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN DE FAVORITOS PERSISTENTES -->
+      <div id="favorites-section" class="w-full space-y-3 pt-2">
+        <div class="flex items-center justify-between px-1">
+          <span class="text-xs font-extrabold uppercase tracking-wider text-stone-400 dark:text-stone-500 flex items-center space-x-1.5">
             <span class="text-amber-400">⭐</span>
             <span>Tus Favoritas</span>
           </span>
@@ -300,45 +345,45 @@
     <!-- 2. PANTALLA DE RESULTADOS (RESULTS SCREEN) -->
     <section id="screen-results" class="hidden space-y-6 pb-12 animate-fadeIn">
 
-      <!-- Barra superior de navegación de resultados -->
+      <!-- Barra superior de navegación -->
       <div class="flex items-center justify-between pt-2">
         <button 
           onclick="showHomeScreen()" 
-          class="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-white dark:bg-[#161B33] border border-stone-200 dark:border-stone-800 text-stone-800 dark:text-stone-200 text-xs font-bold hover:border-brand-500/50 active:scale-95 transition-all shadow-sm"
+          class="inline-flex items-center space-x-2 px-4 py-2.5 rounded-full bg-white dark:bg-[#181C33] border border-stone-200 dark:border-stone-800 text-stone-800 dark:text-stone-200 text-xs font-bold hover:border-moon-purple/50 active:scale-95 transition-all shadow-sm"
         >
-          <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 text-moon-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
-          <span>Volver a buscar</span>
+          <span>Volver al inicio</span>
         </button>
 
         <!-- Botón de Marcar Favorito -->
         <button 
           id="fav-toggle-btn"
           onclick="toggleCurrentFavorite()"
-          class="inline-flex items-center space-x-1.5 px-4 py-2 rounded-full bg-white dark:bg-[#161B33] border border-stone-200 dark:border-stone-800 text-amber-500 text-xs font-bold active:scale-95 transition-all shadow-sm"
+          class="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full bg-white dark:bg-[#181C33] border border-stone-200 dark:border-stone-800 text-amber-500 text-xs font-bold active:scale-95 transition-all shadow-sm"
         >
           <span id="fav-star-icon">☆</span>
           <span id="fav-star-text">Guardar</span>
         </button>
       </div>
 
-      <!-- TARJETA PRINCIPAL DE LA RECETA -->
-      <article class="rounded-3xl bg-white dark:bg-[#161B33] border border-stone-200/80 dark:border-stone-800 p-6 shadow-xl space-y-6">
+      <!-- TARJETA PRINCIPAL DE LA RECETA (SILENT MOON HERO CARD) -->
+      <article class="rounded-[32px] bg-white dark:bg-[#181C33] border border-stone-200/80 dark:border-stone-800 p-6 shadow-xl space-y-6">
         
         <!-- Encabezado Receta -->
-        <div class="border-b border-stone-100 dark:border-stone-800/80 pb-5 space-y-2.5">
+        <div class="border-b border-stone-100 dark:border-stone-800/80 pb-5 space-y-3">
           <div class="flex items-center justify-between">
-            <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-brand-500/10 text-brand-600 dark:text-brand-400 text-xs font-extrabold uppercase tracking-wider border border-brand-500/20">
-              <span class="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"></span>
-              <span>Receta Principal</span>
+            <span class="inline-flex items-center space-x-1.5 px-3.5 py-1 rounded-full bg-moon-purple/10 text-moon-purple text-xs font-extrabold uppercase tracking-wider">
+              <span class="w-2 h-2 rounded-full bg-moon-purple animate-pulse"></span>
+              <span>Oficial de Álvaro Barrientos</span>
             </span>
             <a 
               id="main-yt-btn" 
               href="#" 
               target="_blank" 
               rel="noopener"
-              class="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs font-bold hover:bg-red-500/20 active:scale-95 transition-all"
+              class="inline-flex items-center space-x-1.5 px-4 py-2 rounded-full bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs font-bold hover:bg-red-500/20 active:scale-95 transition-all"
             >
               <svg class="w-4 h-4 fill-current text-red-600 dark:text-red-500" viewBox="0 0 24 24">
                 <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
@@ -351,32 +396,34 @@
             Nombre de Receta
           </h2>
           
-          <p id="recipe-author" class="text-xs sm:text-sm text-brand-600 dark:text-brand-400 font-semibold flex items-center space-x-1.5">
+          <p id="recipe-author" class="text-xs sm:text-sm text-moon-purple font-semibold flex items-center space-x-1.5">
             <span>👨‍🍳</span>
             <span id="recipe-author-text">Por Álvaro Barrientos Montero</span>
           </p>
         </div>
 
-        <!-- SECCIÓN 1: INGREDIENTES -->
+        <!-- SECCIÓN 1: INGREDIENTES CON PROGRESS COUNTER -->
         <div class="space-y-3">
           <div class="flex items-center justify-between">
             <h3 class="font-display text-lg font-extrabold text-stone-900 dark:text-white flex items-center space-x-2">
               <span>🛒</span>
-              <span>Ingredientes</span>
+              <span>Ingredientes (Mise en place)</span>
             </h3>
-            <span class="text-[11px] font-semibold text-stone-400">Toca para tachar</span>
+            <span id="ing-progress-badge" class="text-[11px] font-bold text-moon-purple bg-moon-purple/10 px-2.5 py-0.5 rounded-full">
+              0 completados
+            </span>
           </div>
 
-          <ul id="ingredients-list" class="space-y-2 text-sm text-stone-800 dark:text-stone-200">
+          <ul id="ingredients-list" class="space-y-2.5 text-sm text-stone-800 dark:text-stone-200">
             <!-- Renderizado dinámico de ingredientes -->
           </ul>
         </div>
 
-        <!-- SECCIÓN 2: TIPS CRUCIALES (CON TIMESTAMPS) -->
+        <!-- SECCIÓN 2: TIPS CRUCIALES CON TIMESTAMPS -->
         <div class="space-y-3 pt-2">
           <h3 class="font-display text-lg font-extrabold text-stone-900 dark:text-white flex items-center space-x-2">
             <span>⏱️</span>
-            <span>Tips Cruciales</span>
+            <span>Tips Cruciales del Chef</span>
           </h3>
 
           <div id="tips-list" class="space-y-2.5">
@@ -389,9 +436,9 @@
       <!-- SECCIÓN SECUNDARIA: ALTERNATIVAS DE OTROS YOUTUBERS -->
       <section class="space-y-3.5 pt-2">
         <div class="flex items-center space-x-2">
-          <div class="h-4 w-1 bg-brand-500 rounded-full"></div>
-          <h3 class="font-display text-sm font-extrabold text-stone-800 dark:text-stone-300 uppercase tracking-wider">
-            Otras alternativas rápidas
+          <div class="h-4 w-1 bg-moon-purple rounded-full"></div>
+          <h3 class="font-display text-xs font-extrabold text-stone-400 dark:text-stone-500 uppercase tracking-wider">
+            Otras alternativas en YouTube
           </h3>
         </div>
 
@@ -405,16 +452,16 @@
   </main>
 
   <!-- MODAL CONFIGURACIÓN API KEY -->
-  <dialog id="apikey-modal" class="rounded-3xl bg-white dark:bg-[#161B33] border border-stone-200 dark:border-stone-800 p-6 text-stone-900 dark:text-white max-w-sm w-full backdrop:bg-stone-950/70 shadow-2xl focus:outline-none">
+  <dialog id="apikey-modal" class="rounded-[32px] bg-white dark:bg-[#181C33] border border-stone-200 dark:border-stone-800 p-6 text-stone-900 dark:text-white max-w-sm w-full backdrop:bg-stone-950/75 shadow-2xl focus:outline-none">
     <div class="space-y-4">
       <div class="flex justify-between items-start">
-        <h3 class="font-display text-lg font-extrabold text-brand-500 flex items-center space-x-2">
+        <h3 class="font-display text-lg font-extrabold text-moon-purple flex items-center space-x-2">
           <span>🔑</span>
           <span>Configurar Gemini API</span>
         </h3>
         <button onclick="closeApiKeyModal()" class="text-stone-400 hover:text-stone-600 dark:hover:text-white text-xl font-bold focus:outline-none">&times;</button>
       </div>
-      <p class="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">
+      <p class="text-xs text-stone-500 dark:text-stone-400 leading-relaxed font-medium">
         Esta app utiliza la API de Gemini con búsqueda integrada para rastrear videos reales en YouTube y extraer los ingredientes y timestamps exactos.
       </p>
       
@@ -424,15 +471,15 @@
           type="password" 
           id="apikey-input" 
           placeholder="AIzaSy..." 
-          class="w-full px-4 py-3 rounded-2xl bg-stone-100 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-stone-600 text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+          class="w-full px-4 py-3 rounded-2xl bg-stone-100 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-stone-600 text-sm focus:outline-none focus:border-moon-purple focus:ring-2 focus:ring-moon-purple/20"
         />
-        <a href="https://aistudio.google.com/api-keys" target="_blank" rel="noopener" class="inline-block text-[11px] text-brand-600 dark:text-brand-400 font-semibold hover:underline pt-0.5">
+        <a href="https://aistudio.google.com/api-keys" target="_blank" rel="noopener" class="inline-block text-[11px] text-moon-purple font-semibold hover:underline pt-0.5">
           Obtén una llave gratis en Google AI Studio ↗
         </a>
       </div>
 
       <div class="flex space-x-3 pt-2">
-        <button onclick="saveApiKey()" class="flex-1 py-3 rounded-full bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs active:scale-95 transition-all shadow-md shadow-brand-500/20">
+        <button onclick="saveApiKey()" class="flex-1 py-3 rounded-full bg-moon-purple hover:bg-moon-purple/90 text-white font-bold text-xs active:scale-95 transition-all shadow-md shadow-moon-purple/20">
           Guardar Llave
         </button>
         <button onclick="closeApiKeyModal()" class="flex-1 py-3 rounded-full bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 text-xs font-semibold hover:bg-stone-200 dark:hover:bg-stone-700 active:scale-95 transition-all">
@@ -451,6 +498,21 @@
   <script>
     let currentRecipeKey = null;
 
+    // GREETING DINÁMICO SEGÚN LA HORA DEL DÍA (SILENT MOON STYLE)
+    function updateDynamicGreeting() {
+      const hour = new Date().getHours();
+      const greetingEl = document.getElementById('greeting-title');
+      if (!greetingEl) return;
+
+      if (hour >= 6 && hour < 13) {
+        greetingEl.textContent = '¡Buenos días, Chef! 🍳';
+      } else if (hour >= 13 && hour < 20) {
+        greetingEl.textContent = '¡Buenas tardes, Chef! 🥘';
+      } else {
+        greetingEl.textContent = '¡Buenas noches, Chef! 🍷';
+      }
+    }
+
     // TEMA LIGHT / DARK MANAGEMENT
     function initTheme() {
       const savedTheme = localStorage.getItem('fastcooking_theme');
@@ -465,15 +527,18 @@
     function applyTheme(theme) {
       const htmlEl = document.documentElement;
       const themeIcon = document.getElementById('theme-icon');
+      const themeText = document.getElementById('theme-text');
       
       if (theme === 'dark') {
         htmlEl.classList.add('dark');
         htmlEl.classList.remove('light');
         if (themeIcon) themeIcon.textContent = '☀️';
+        if (themeText) themeText.textContent = 'Modo Claro';
       } else {
         htmlEl.classList.add('light');
         htmlEl.classList.remove('dark');
         if (themeIcon) themeIcon.textContent = '🌙';
+        if (themeText) themeText.textContent = 'Modo Oscuro';
       }
       localStorage.setItem('fastcooking_theme', theme);
     }
@@ -498,7 +563,6 @@
       localStorage.setItem('fastcooking_gemini_key', key);
       closeApiKeyModal();
       
-      // Desregistrar Service Worker previo para limpiar caché al configurar nueva clave
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(registrations => {
           for(let reg of registrations) {
@@ -520,7 +584,7 @@
       document.getElementById('apikey-modal').close();
     }
 
-    // FORMATEADOR DE LINKS DE TIMESTAMP ULTRA ROBUSTO
+    // FORMATEADOR DE LINKS DE TIMESTAMP
     function formatYoutubeTimestampLink(baseUrl, seconds) {
       if (!baseUrl) return '#';
       
@@ -601,11 +665,11 @@
       if (currentRecipeKey && isFavorite(currentRecipeKey)) {
         icon.textContent = '★';
         text.textContent = 'Guardada';
-        btn.className = "inline-flex items-center space-x-1.5 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-bold active:scale-95 transition-all shadow-sm";
+        btn.className = "inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-bold active:scale-95 transition-all shadow-sm";
       } else {
         icon.textContent = '☆';
         text.textContent = 'Guardar';
-        btn.className = "inline-flex items-center space-x-1.5 px-4 py-2 rounded-full bg-white dark:bg-[#161B33] border border-stone-200 dark:border-stone-800 text-amber-500 text-xs font-bold active:scale-95 transition-all shadow-sm";
+        btn.className = "inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full bg-white dark:bg-[#181C33] border border-stone-200 dark:border-stone-800 text-amber-500 text-xs font-bold active:scale-95 transition-all shadow-sm";
       }
     }
 
@@ -619,7 +683,7 @@
 
       if (favs.length === 0) {
         listContainer.innerHTML = `
-          <div class="p-4 rounded-2xl bg-stone-100/60 dark:bg-stone-900/40 border border-dashed border-stone-200 dark:border-stone-800 text-stone-400 dark:text-stone-500 text-xs">
+          <div class="p-4 rounded-2xl bg-stone-100/70 dark:bg-stone-900/50 border border-dashed border-stone-200 dark:border-stone-800 text-stone-400 dark:text-stone-500 text-xs text-center font-medium">
             Aún no tienes recetas favoritas. Busca cualquier plato y toca guardar.
           </div>
         `;
@@ -632,14 +696,14 @@
         return `
           <div 
             onclick="renderRecipeDirectly('${key}')"
-            class="flex items-center justify-between p-3.5 rounded-2xl bg-white dark:bg-[#161B33] border border-stone-200/80 dark:border-stone-800/80 hover:border-brand-500/40 cursor-pointer active:scale-[0.98] transition-all shadow-sm group"
+            class="flex items-center justify-between p-3.5 rounded-2xl bg-white dark:bg-[#181C33] border border-stone-200/80 dark:border-stone-800 hover:border-moon-purple/50 cursor-pointer active:scale-[0.98] transition-all shadow-sm group"
           >
             <div class="flex items-center space-x-3">
-              <div class="w-9 h-9 rounded-xl bg-brand-500/10 text-brand-500 flex items-center justify-center text-base font-bold">
+              <div class="w-10 h-10 rounded-2xl bg-moon-purple/10 text-moon-purple flex items-center justify-center text-lg font-bold">
                 🍳
               </div>
               <div class="text-left">
-                <h4 class="font-display font-extrabold text-sm text-stone-900 dark:text-stone-100 group-hover:text-brand-500 transition-colors">
+                <h4 class="font-display font-extrabold text-sm text-stone-900 dark:text-stone-100 group-hover:text-moon-purple transition-colors">
                   ${recipe.title}
                 </h4>
                 <p class="text-[11px] text-stone-400 font-medium">${recipe.author}</p>
@@ -647,11 +711,28 @@
             </div>
             <div class="flex items-center space-x-2">
               <span class="text-amber-400 text-sm">★</span>
-              <span class="text-stone-400 group-hover:text-brand-500 text-xs font-bold">Ver ➔</span>
+              <span class="text-stone-400 group-hover:text-moon-purple text-xs font-bold">Ver ➔</span>
             </div>
           </div>
         `;
       }).join('');
+    }
+
+    function updateIngredientsProgress() {
+      const checkboxes = document.querySelectorAll('.ingredient-checkbox');
+      const total = checkboxes.length;
+      let checked = 0;
+      checkboxes.forEach(cb => { if (cb.checked) checked++; });
+      
+      const badge = document.getElementById('ing-progress-badge');
+      if (badge) {
+        badge.textContent = `${checked} de ${total} listos`;
+        if (checked === total && total > 0) {
+          badge.className = "text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full";
+        } else {
+          badge.className = "text-[11px] font-bold text-moon-purple bg-moon-purple/10 px-2.5 py-0.5 rounded-full";
+        }
+      }
     }
 
     // Helper: Normalizar texto
@@ -696,7 +777,7 @@
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
       const promptText = `Busca el video oficial de YouTube del chef chileno Álvaro Barrientos Montero cocinando la receta de: "${queryVal}".
-Debes extraer la información real del video y formatearla strictly como un objeto JSON con los datos exactos del video encontrado.
+Debes extraer la información real del video y formatearla estrictamente como un objeto JSON con los datos exactos del video encontrado.
 
 Estructura requerida:
 {
@@ -826,7 +907,6 @@ REGLAS CRÍTICAS:
       for (const model of modelsToTry) {
         if (success) break;
 
-        // Intento A: Con herramienta de búsqueda
         try {
           showLoadingScreen(`Buscando con ${model} y YouTube...`);
           apiResult = await callGeminiAPI(apiKey, inputVal, true, model);
@@ -842,7 +922,6 @@ REGLAS CRÍTICAS:
           }
         }
 
-        // Intento B: Sin herramienta de búsqueda
         try {
           showLoadingScreen(`Consultando con ${model} directamente...`);
           apiResult = await callGeminiAPI(apiKey, inputVal, false, model);
@@ -873,7 +952,6 @@ REGLAS CRÍTICAS:
         const recipeData = JSON.parse(match[0]);
         recipeData.key = normalizeText(inputVal);
 
-        // Sanitización y fallback de la URL de YouTube
         const knownFakeIds = ["wX-y0Y1vJ4E", "VIDEO_ID", "ID_REAL", "[VIDEO_ID]", "abcdefghijk", "12345678901"];
         let finalUrl = (apiResult && apiResult.groundingUrl) ? apiResult.groundingUrl : (recipeData.baseUrl || "");
 
@@ -887,10 +965,7 @@ REGLAS CRÍTICAS:
         }
         recipeData.baseUrl = finalUrl;
 
-        // Guardar receta en cache local
         saveCustomRecipe(recipeData);
-
-        // Mostrar la Receta
         renderRecipeUI(recipeData);
 
       } catch (err) {
@@ -918,7 +993,6 @@ REGLAS CRÍTICAS:
       
       currentRecipeKey = data.key;
 
-      // Sanitizar la baseUrl al renderizar (por si viene de un guardado local antiguo)
       const knownFakeIds = ["wX-y0Y1vJ4E", "VIDEO_ID", "ID_REAL", "[VIDEO_ID]", "abcdefghijk", "12345678901"];
       let safeBaseUrl = data.baseUrl || "";
       if (!safeBaseUrl || knownFakeIds.some(fake => safeBaseUrl.includes(fake)) || (!safeBaseUrl.includes('youtube.com/watch') && !safeBaseUrl.includes('youtu.be/') && !safeBaseUrl.includes('youtube.com/results'))) {
@@ -926,27 +1000,28 @@ REGLAS CRÍTICAS:
         safeBaseUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
       }
 
-      // Actualizar datos Principales
       document.getElementById('recipe-title').textContent = data.title;
       document.getElementById('recipe-author-text').textContent = `Por ${data.author}`;
       document.getElementById('main-yt-btn').href = safeBaseUrl;
 
       updateFavoriteButtonUI();
 
-      // Renderizar Ingredientes con Checkboxes
+      // Renderizar Ingredientes con Checkboxes & Counter
       const ingredientsContainer = document.getElementById('ingredients-list');
       ingredientsContainer.innerHTML = data.ingredients.map((ing, idx) => `
-        <li class="flex items-start space-x-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-900/60 border border-stone-200/70 dark:border-stone-800 hover:border-brand-500/40 transition-colors cursor-pointer">
+        <li class="flex items-start space-x-3 p-3.5 rounded-2xl bg-stone-50 dark:bg-[#1C203B] border border-stone-200/70 dark:border-stone-800 hover:border-moon-purple/50 transition-colors cursor-pointer">
           <input 
             type="checkbox" 
             id="ing-${idx}" 
-            class="ingredient-checkbox mt-0.5 w-4 h-4 rounded-md border-stone-300 dark:border-stone-600 text-brand-500 focus:ring-brand-500 focus:ring-offset-stone-900 bg-stone-100 dark:bg-stone-800 cursor-pointer"
+            onchange="updateIngredientsProgress()"
+            class="ingredient-checkbox mt-0.5 w-4.5 h-4.5 rounded-md border-stone-300 dark:border-stone-600 text-moon-purple focus:ring-moon-purple focus:ring-offset-stone-900 bg-stone-100 dark:bg-stone-800 cursor-pointer"
           />
           <label for="ing-${idx}" class="cursor-pointer select-none text-stone-800 dark:text-stone-200 flex-1 text-xs sm:text-sm font-medium leading-normal">
             <span>${ing}</span>
           </label>
         </li>
       `).join('');
+      updateIngredientsProgress();
 
       // Renderizar Tips con Links exactos (&t=X)
       const tipsContainer = document.getElementById('tips-list');
@@ -958,10 +1033,10 @@ REGLAS CRÍTICAS:
             href="${ytTimeLink}" 
             target="_blank" 
             rel="noopener"
-            class="group block p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-900/80 border border-stone-200/70 dark:border-stone-800 hover:border-brand-500/50 hover:bg-white dark:hover:bg-stone-900 active:scale-[0.98] transition-all shadow-sm"
+            class="group block p-4 rounded-2xl bg-stone-50 dark:bg-[#1C203B] border border-stone-200/70 dark:border-stone-800 hover:border-moon-purple/50 hover:bg-white dark:hover:bg-[#212647] active:scale-[0.98] transition-all shadow-sm"
           >
             <div class="flex items-start space-x-3">
-              <span class="inline-flex items-center px-2.5 py-1 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-400 font-mono text-xs font-bold border border-brand-500/20 group-hover:bg-brand-500 group-hover:text-white transition-colors shrink-0">
+              <span class="inline-flex items-center px-3 py-1 rounded-xl bg-moon-purple/10 text-moon-purple font-mono text-xs font-bold border border-moon-purple/20 group-hover:bg-moon-purple group-hover:text-white transition-colors shrink-0">
                 ${tip.timestamp} ↗
               </span>
               <p class="text-xs sm:text-sm text-stone-800 dark:text-stone-200 group-hover:text-stone-900 dark:group-hover:text-white transition-colors leading-relaxed font-medium">
@@ -972,23 +1047,22 @@ REGLAS CRÍTICAS:
         `;
       }).join('');
 
-      // Renderizar Alternativas (Estilo Pastel Silent Moon)
+      // Renderizar Alternativas
       const alternativesContainer = document.getElementById('alternatives-list');
       alternativesContainer.innerHTML = data.alternatives.map(alt => `
-        <div class="p-4 rounded-3xl bg-indigo-500/5 dark:bg-indigo-500/10 border border-indigo-500/15 space-y-2">
+        <div class="p-4 rounded-3xl bg-[#E8EAFF]/60 dark:bg-[#1C203B] border border-indigo-200/60 dark:border-indigo-500/20 space-y-2">
           <h4 class="font-display text-sm font-extrabold text-indigo-900 dark:text-indigo-200">
             ${alt.style}
           </h4>
           <p class="text-xs text-stone-600 dark:text-stone-400 leading-relaxed font-medium">
-            <strong class="text-stone-800 dark:text-stone-200 font-bold">Diferencia clave:</strong> ${alt.diff}
+            <strong class="text-stone-900 dark:text-stone-200 font-bold">Diferencia clave:</strong> ${alt.diff}
           </p>
-          <p class="text-xs text-brand-600 dark:text-brand-400 leading-relaxed pt-1 font-medium">
+          <p class="text-xs text-moon-purple leading-relaxed pt-1 font-medium">
             <strong class="font-bold">💡 Tip principal:</strong> ${alt.tip}
           </p>
         </div>
       `).join('');
 
-      // Cambiar a pantalla de resultados
       document.getElementById('screen-home').classList.add('hidden');
       document.getElementById('screen-results').classList.remove('hidden');
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -999,6 +1073,7 @@ REGLAS CRÍTICAS:
       document.getElementById('screen-loading').classList.add('hidden');
       document.getElementById('screen-error').classList.add('hidden');
       document.getElementById('screen-home').classList.remove('hidden');
+      updateDynamicGreeting();
       renderFavoritesList();
       document.getElementById('search-input').focus();
     }
@@ -1129,6 +1204,7 @@ REGLAS CRÍTICAS:
 
     document.addEventListener('DOMContentLoaded', () => {
       initTheme();
+      updateDynamicGreeting();
       renderFavoritesList();
     });
   </script>
