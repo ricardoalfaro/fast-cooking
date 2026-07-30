@@ -26,7 +26,7 @@ La aplicación está diseñada bajo el principio de simplicidad y portabilidad a
 - **Estilos:** Tailwind CSS CDN con fuentes de Google (*Plus Jakarta Sans* y *Outfit*).
 - **Integración IA (Gemini API):**
   - Conexión cliente-servidor directa a los modelos de Google AI Studio (`v1beta`).
-  - **Autodetección Dinámica de Modelos:** Consulta el endpoint `GET /models` con la clave de API para detectar y utilizar automáticamente el modelo Flash activo en tu cuenta (ej. `gemini-3.5-flash` o `gemini-3.0-flash`), evitando fallas por descontinuación de modelos anteriores.
+  - **Autodetección Dinámica de Modelos:** Consulta el endpoint `GET /models` con la clave de API para detectar y utilizar automáticamente el modelo Flash activo en tu cuenta (ej. `gemini-3.6-flash` o `gemini-3.5-flash`), evitando fallas por descontinuación de modelos anteriores.
   - **Google Search Grounding:** Envía la solicitud con la herramienta `google_search` activa para que Gemini rastree en tiempo real los enlaces watch directos y los contenidos del video en YouTube.
   - **Estrategia Autocurativa (Auto-healing):** Si la clave de API tiene restricciones para usar herramientas de búsqueda en Google (común en planes gratuitos), la app atrapa el error y reintenta de inmediato la consulta de forma directa sin herramientas.
   - **Parseo Robusto:** Extracción estructurada del JSON mediante expresiones regulares (`Regex`) aislando cualquier formato Markdown.
