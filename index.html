@@ -596,14 +596,14 @@ Estructura requerida:
 {
   "title": "Nombre de la receta real",
   "author": "Álvaro Barrientos Montero",
-  "baseUrl": "https://www.youtube.com/watch?v=VIDEO_ID", // URL exacta e individual de reproducción del video de YouTube encontrado. No uses links de búsqueda (/results) ni de canales. Debe ser un link watch de video directo.
+  "baseUrl": "URL watch real de YouTube encontrada",
   "ingredients": [
     "lista de ingredientes reales detallados del video con sus cantidades"
   ],
   "tips": [
     {
-      "timestamp": "[MM:SS]", // El timestamp del video donde ocurre este tip (ej: [02:07])
-      "seconds": 127, // El segundo entero correspondiente a ese timestamp (ej. [02:07] es 127)
+      "timestamp": "[MM:SS]",
+      "seconds": 127,
       "text": "Consejo exacto y crucial entregado por el chef en ese segundo"
     }
   ],
@@ -612,19 +612,14 @@ Estructura requerida:
       "style": "Estilo alternativo de otro YouTuber (ej: Estilo Silvana Cocina)",
       "diff": "Diferencia principal con el método de Álvaro Barrientos",
       "tip": "Tip principal de esta alternativa"
-    },
-    {
-      "style": "Estilo alternativo 2 (ej: Estilo Exprés)",
-      "diff": "Diferencia con el plato principal",
-      "tip": "Tip principal de esta segunda alternativa"
     }
   ]
 }
 
 REGLAS CRÍTICAS:
-1. La 'baseUrl' DEBE ser estrictamente una URL watch de video de YouTube (ej: https://www.youtube.com/watch?v=wX-y0Y1vJ4E). Está terminantemente prohibido usar enlaces de búsqueda (/results) o de canales.
+1. NUNCA inventes IDs de video ficticios ni utilices cadenas de ejemplo como 'wX-y0Y1vJ4E' o 'VIDEO_ID'. Si encuentras el video exacto en la búsqueda de Google, usa su URL watch de YouTube. Si no estás seguro del enlace exacto del video, pon 'baseUrl': 'https://www.youtube.com/results?search_query=Alvaro+Barrientos+Montero+${encodeURIComponent(queryVal)}'.
 2. No inventes ingredientes ni tips. Deben corresponder a la receta del video del chef Álvaro Barrientos.
-3. Los tips con timestamps DEBEN coincidir exactamente con los segundos del video real de YouTube. Calcula los segundos correctamente para armar el link directo (&t=Xs).
+3. Los tips con timestamps DEBEN coincidir exactamente con los segundos del video real de YouTube.
 4. Devuelve únicamente el objeto JSON sin envolverlo en bloques de código markdown ni texto adicional.`;
 
       const requestBody = {
@@ -672,7 +667,21 @@ REGLAS CRÍTICAS:
         throw new Error("No se encontró texto en la respuesta del modelo.");
       }
 
-      return textPart.text;
+      let groundingUrl = null;
+      if (candidate.groundingMetadata && candidate.groundingMetadata.groundingChunks) {
+        for (const chunk of candidate.groundingMetadata.groundingChunks) {
+          const uri = chunk.web?.uri;
+          if (uri && (uri.includes('youtube.com/watch') || uri.includes('youtu.be/'))) {
+            groundingUrl = uri;
+            break;
+          }
+        }
+      }
+
+      return {
+        text: textPart.text,
+        groundingUrl: groundingUrl
+      };
     }
 
     // MANEJO DE BÚSQUEDA GENERAL
@@ -705,6 +714,7 @@ REGLAS CRÍTICAS:
       
       let success = false;
       let geminiText = "";
+      let apiResult = null;
       let lastError = null;
 
       for (const model of modelsToTry) {
@@ -713,7 +723,8 @@ REGLAS CRÍTICAS:
         // Intento A: Con herramienta de búsqueda
         try {
           showLoadingScreen(`Buscando con ${model} y YouTube...`);
-          geminiText = await callGeminiAPI(apiKey, inputVal, true, model);
+          apiResult = await callGeminiAPI(apiKey, inputVal, true, model);
+          geminiText = apiResult.text;
           success = true;
           break;
         } catch (searchError) {
@@ -728,7 +739,8 @@ REGLAS CRÍTICAS:
         // Intento B: Sin herramienta de búsqueda
         try {
           showLoadingScreen(`Consultando con ${model} directamente...`);
-          geminiText = await callGeminiAPI(apiKey, inputVal, false, model);
+          apiResult = await callGeminiAPI(apiKey, inputVal, false, model);
+          geminiText = apiResult.text;
           success = true;
           break;
         } catch (noSearchError) {
@@ -754,6 +766,20 @@ REGLAS CRÍTICAS:
 
         const recipeData = JSON.parse(match[0]);
         recipeData.key = normalizeText(inputVal);
+
+        // Sanitización y fallback de la URL de YouTube
+        const knownFakeIds = ["wX-y0Y1vJ4E", "VIDEO_ID", "ID_REAL", "[VIDEO_ID]", "abcdefghijk", "12345678901"];
+        let finalUrl = (apiResult && apiResult.groundingUrl) ? apiResult.groundingUrl : (recipeData.baseUrl || "");
+
+        const isBroken = !finalUrl || 
+          knownFakeIds.some(fake => finalUrl.includes(fake)) ||
+          (!finalUrl.includes('youtube.com/watch') && !finalUrl.includes('youtu.be/') && !finalUrl.includes('youtube.com/results'));
+
+        if (isBroken) {
+          const searchQuery = `Álvaro Barrientos Montero ${recipeData.title || inputVal}`;
+          finalUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
+        }
+        recipeData.baseUrl = finalUrl;
 
         // Guardar receta en cache local
         saveCustomRecipe(recipeData);
@@ -786,10 +812,18 @@ REGLAS CRÍTICAS:
       
       currentRecipeKey = data.key;
 
+      // Sanitizar la baseUrl al renderizar (por si viene de un guardado local antiguo)
+      const knownFakeIds = ["wX-y0Y1vJ4E", "VIDEO_ID", "ID_REAL", "[VIDEO_ID]", "abcdefghijk", "12345678901"];
+      let safeBaseUrl = data.baseUrl || "";
+      if (!safeBaseUrl || knownFakeIds.some(fake => safeBaseUrl.includes(fake)) || (!safeBaseUrl.includes('youtube.com/watch') && !safeBaseUrl.includes('youtu.be/') && !safeBaseUrl.includes('youtube.com/results'))) {
+        const searchQuery = `Álvaro Barrientos Montero ${data.title || ''}`;
+        safeBaseUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
+      }
+
       // Actualizar datos Principales
       document.getElementById('recipe-title').textContent = data.title;
       document.getElementById('recipe-author-text').textContent = `Por ${data.author}`;
-      document.getElementById('main-yt-btn').href = data.baseUrl;
+      document.getElementById('main-yt-btn').href = safeBaseUrl;
 
       updateFavoriteButtonUI();
 
@@ -812,7 +846,7 @@ REGLAS CRÍTICAS:
       const tipsContainer = document.getElementById('tips-list');
       tipsContainer.innerHTML = data.tips.map(tip => {
         // Formatear correctamente la URL con el timestamp en segundos
-        const ytTimeLink = formatYoutubeTimestampLink(data.baseUrl, tip.seconds);
+        const ytTimeLink = formatYoutubeTimestampLink(safeBaseUrl, tip.seconds);
         
         return `
           <a 
