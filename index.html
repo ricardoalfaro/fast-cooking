@@ -242,7 +242,7 @@
             placeholder="Ej: Pizza, Empanadas de pino, Sopaipillas..." 
             autocomplete="off"
             required
-            class="w-full pl-13 pr-28 py-4.5 rounded-full bg-white dark:bg-[#181C33] border border-stone-200/80 dark:border-stone-800 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-stone-500 text-sm sm:text-base focus:outline-none focus:border-moon-purple focus:ring-4 focus:ring-moon-purple/20 transition-all shadow-md dark:shadow-none"
+            class="w-full h-14 pl-12 pr-28 rounded-full bg-white dark:bg-[#181C33] border border-stone-200 dark:border-stone-800 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-stone-500 text-sm sm:text-base focus:outline-none focus:border-moon-purple focus:ring-4 focus:ring-moon-purple/20 transition-all shadow-md dark:shadow-none"
           />
           <button 
             type="submit" 
@@ -997,12 +997,6 @@ REGLAS CRÍTICAS:
         showErrorScreen(err.message, err.stack || "");
       } finally {
         searchAbortController = null;
-      }
-    }derRecipeUI(recipeData);
-
-      } catch (err) {
-        console.error(err);
-        showErrorScreen(err.message, err.stack || "");
       }
     }
 
