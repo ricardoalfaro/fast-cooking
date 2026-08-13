@@ -382,56 +382,40 @@
           </div>
         </div>
 
-        <!-- SECCIÓN 1: INGREDIENTES CON PROGRESS COUNTER -->
-        <div class="space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 class="font-display text-lg font-extrabold text-stone-900 dark:text-white flex items-center space-x-2">
-              <span>🛒</span>
-              <span>Ingredientes (Mise en place)</span>
-            </h3>
-            <span id="ing-progress-badge" class="text-[11px] font-bold text-moon-purple bg-moon-purple/10 px-2.5 py-0.5 rounded-full">
-              0 completados
-            </span>
-          </div>
+        <!-- SECCIONES PLEGABLES -->
+        <details open class="group rounded-2xl border border-stone-200/70 dark:border-stone-800 bg-stone-50/70 dark:bg-[#151515]">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-3 p-4">
+            <h3 class="font-display text-lg font-extrabold text-stone-900 dark:text-white">🛒 Ingredientes · Mise en place</h3>
+            <span class="flex items-center gap-2"><span id="ing-progress-badge" class="text-[11px] font-bold text-moon-purple bg-moon-purple/10 px-2.5 py-0.5 rounded-full">0 listos</span><span class="text-moon-purple transition-transform group-open:rotate-180">⌄</span></span>
+          </summary>
+          <ul id="ingredients-list" class="space-y-2.5 px-4 pb-4 text-sm text-stone-800 dark:text-stone-200"></ul>
+        </details>
 
-          <ul id="ingredients-list" class="space-y-2.5 text-sm text-stone-800 dark:text-stone-200">
-            <!-- Renderizado dinámico de ingredientes -->
-          </ul>
-        </div>
-
-        <!-- SECCIÓN 2: TIPS CRUCIALES CON TIMESTAMPS -->
-        <div class="space-y-3 pt-2">
-          <h3 class="font-display text-lg font-extrabold text-stone-900 dark:text-white flex items-center space-x-2">
-            <span>⏱️</span>
-            <span>Tips Cruciales del Chef</span>
-          </h3>
-
-          <div id="tips-list" class="space-y-2.5">
-            <!-- Renderizado dinámico de tips con links exactos -->
-          </div>
-        </div>
+        <details class="group rounded-2xl border border-stone-200/70 dark:border-stone-800 bg-stone-50/70 dark:bg-[#151515]">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-3 p-4">
+            <h3 class="font-display text-lg font-extrabold text-stone-900 dark:text-white">▶ Vínculos al video</h3>
+            <span class="text-moon-purple transition-transform group-open:rotate-180">⌄</span>
+          </summary>
+          <div id="tips-list" class="space-y-2.5 px-4 pb-4"></div>
+        </details>
 
       </article>
 
       <!-- SECCIÓN SECUNDARIA: ALTERNATIVAS DE OTROS YOUTUBERS -->
-      <section class="space-y-3.5 pt-2">
-        <div class="flex items-center space-x-2">
-          <div class="h-4 w-1 bg-moon-purple rounded-full"></div>
-          <h3 class="font-display text-xs font-extrabold text-stone-400 dark:text-stone-500 uppercase tracking-wider">
-            Otras alternativas en YouTube
-          </h3>
-        </div>
-
-        <div id="alternatives-list" class="space-y-3">
-          <!-- Renderizado dinámico de alternativas -->
-        </div>
-      </section>
+      <details class="group rounded-2xl border border-stone-200/70 dark:border-stone-800 bg-white dark:bg-[#1A1A1A]">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-3 p-4">
+          <h3 class="font-display text-sm font-extrabold uppercase tracking-wider text-stone-500 dark:text-stone-400">Otras alternativas en YouTube</h3>
+          <span class="text-moon-purple transition-transform group-open:rotate-180">⌄</span>
+        </summary>
+        <div id="alternatives-list" class="space-y-3 px-4 pb-4"></div>
+      </details>
 
     </section>
 
   </main>
 
   <!-- TEMPORIZADOR DE COCINA -->
+  <button id="timer-fab" type="button" onclick="toggleTimerPanel()" aria-label="Abrir temporizador" class="hidden fixed right-5 top-24 z-40 flex h-12 w-12 items-center justify-center rounded-2xl bg-moon-purple text-xl text-white shadow-lg shadow-moon-purple/30 active:scale-95 transition">⏲</button>
   <section id="timer-widget" class="hidden fixed bottom-5 left-4 right-4 z-40 max-w-md mx-auto rounded-3xl bg-[#1E2442] text-white p-4 shadow-2xl shadow-moon-purple/30">
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 rounded-2xl bg-white/15 flex items-center justify-center text-lg">⏲️</div>
@@ -770,7 +754,7 @@
           >
             <div class="flex items-center space-x-3">
               <div class="w-10 h-10 rounded-2xl bg-stone-800 overflow-hidden shrink-0">
-                ${getRecipeImage(recipe) ? `<img src="${getRecipeImage(recipe)}" alt="" class="w-full h-full object-cover" />` : '<span class="w-full h-full flex items-center justify-center text-moon-purple">🍳</span>'}
+                <img src="${getRecipeImage(recipe)}" onerror="this.onerror=null;this.src='public/recipe-fallback.png'" alt="" class="w-full h-full object-cover" />
               </div>
               <div class="text-left">
                 <h4 class="font-display font-extrabold text-sm text-stone-900 dark:text-stone-100 group-hover:text-moon-purple transition-colors">
@@ -813,7 +797,7 @@
         return `
           <button type="button" onclick="renderRecipeDirectly(decodeURIComponent('${encodedKey}'))" class="flex items-center justify-between p-3.5 rounded-2xl bg-white dark:bg-[#181C33] border border-stone-200/80 dark:border-stone-800 hover:border-moon-purple/50 text-left active:scale-[0.98] transition-all shadow-sm group">
             <span class="flex min-w-0 items-center space-x-3">
-              <span class="w-10 h-10 rounded-2xl bg-stone-800 overflow-hidden shrink-0">${getRecipeImage(recipe) ? `<img src="${getRecipeImage(recipe)}" alt="" class="w-full h-full object-cover" />` : '<span class="w-full h-full flex items-center justify-center text-moon-purple">🕘</span>'}</span>
+              <span class="w-10 h-10 rounded-2xl bg-stone-800 overflow-hidden shrink-0"><img src="${getRecipeImage(recipe)}" onerror="this.onerror=null;this.src='public/recipe-fallback.png'" alt="" class="w-full h-full object-cover" /></span>
               <span class="min-w-0">
                 <span class="block truncate font-display font-extrabold text-sm text-stone-900 dark:text-stone-100 group-hover:text-moon-purple transition-colors">${escapeHtml(recipe.title)}</span>
                 <span class="block truncate text-[11px] text-stone-400 font-medium">${recentSearchLabel(item.consultedAt)}</span>
@@ -893,25 +877,26 @@
 
     async function generateRecipeCover(recipe) {
       const apiKey = getApiKey();
-      if (!apiKey || recipe.coverImage || recipe.coverImageFailed) return recipe.coverImage || '';
-      const imageModels = ['gemini-3.1-flash-image', 'gemini-2.5-flash-image'];
+      if (!apiKey || recipe.coverImage || (recipe.coverImageFailedAt && Date.now() - recipe.coverImageFailedAt < 86400000)) return recipe.coverImage || '';
+      const imageModels = ['gemini-2.5-flash-image', 'gemini-3.1-flash-image'];
       const prompt = `Food editorial photograph for a premium dark-mode cooking app. Dish: "${recipe.title}". Close three-quarter angle, plated Chilean home-style food, rich warm natural light, charcoal black background, subtle orange highlights, appetizing texture, no people, no utensils covering the food, no text, no logo, no watermark. Landscape 16:9 composition with the food weighted to the right and calm dark negative space on the left.`;
 
       for (const model of imageModels) {
         try {
-          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+          const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/${model}:generateContent`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
             body: JSON.stringify({
               contents: [{ parts: [{ text: prompt }] }],
-              generationConfig: { responseModalities: ['IMAGE'] }
+              generationConfig: { responseModalities: ['TEXT', 'IMAGE'] }
             })
           });
           if (!response.ok) continue;
           const payload = await response.json();
           const imagePart = payload.candidates?.[0]?.content?.parts?.find(part => part.inlineData?.data);
           if (!imagePart) continue;
-          const coverImage = `data:${imagePart.inlineData.mimeType || 'image/png'};base64,${imagePart.inlineData.data}`;
+          const rawCoverImage = `data:${imagePart.inlineData.mimeType || 'image/png'};base64,${imagePart.inlineData.data}`;
+          const coverImage = await compressRecipeCover(rawCoverImage);
           const updatedRecipe = { ...recipe, coverImage, coverImageGeneratedAt: Date.now() };
           saveCustomRecipe(updatedRecipe);
           if (currentRecipeKey === recipe.key) {
@@ -927,14 +912,31 @@
           console.warn(`No se pudo crear la portada con ${model}.`, error);
         }
       }
-      saveCustomRecipe({ ...recipe, coverImageFailed: true });
+      saveCustomRecipe({ ...recipe, coverImageFailedAt: Date.now() });
       return '';
+    }
+
+    function compressRecipeCover(dataUrl) {
+      return new Promise(resolve => {
+        const image = new Image();
+        image.onload = () => {
+          const canvas = document.createElement('canvas');
+          const width = 720;
+          const height = Math.round(image.height * (width / image.width));
+          canvas.width = width;
+          canvas.height = height;
+          canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', 0.72));
+        };
+        image.onerror = () => resolve(dataUrl);
+        image.src = dataUrl;
+      });
     }
 
     function getRecipeImage(recipe) {
       if (recipe?.coverImage) return recipe.coverImage;
       const videoId = extractYoutubeVideoId(recipe?.baseUrl || '');
-      return videoId ? `https://img.youtube.com/vi/${encodeURIComponent(videoId)}/mqdefault.jpg` : '';
+      return videoId ? `https://img.youtube.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg` : 'public/recipe-fallback.png';
     }
 
     function renderLastRecipeCard() {
@@ -954,6 +956,7 @@
       card.onclick = () => renderRecipeDirectly(latest.key);
       if (imageUrl) {
         image.src = imageUrl;
+        image.onerror = () => { image.onerror = null; image.src = 'public/recipe-fallback.png'; };
         image.classList.remove('hidden');
       } else {
         image.removeAttribute('src');
@@ -1260,7 +1263,7 @@ REGLAS CRÍTICAS:
       currentRecipe = data;
       currentServings = Math.max(1, Number(data.servings) || 4);
       renderLastRecipeCard();
-      if (!data.coverImage && !data.coverImageFailed) {
+      if (!data.coverImage) {
         generateRecipeCover(data);
       }
 
@@ -1280,6 +1283,7 @@ REGLAS CRÍTICAS:
       const recipeImage = getRecipeImage(data);
       if (recipeImage) {
         thumbnailImg.src = recipeImage;
+        thumbnailImg.onerror = () => { thumbnailImg.onerror = null; thumbnailImg.src = 'public/recipe-fallback.png'; };
         thumbnail.classList.remove('hidden');
       } else {
         thumbnailImg.removeAttribute('src');
@@ -1332,7 +1336,8 @@ REGLAS CRÍTICAS:
 
       document.getElementById('screen-home').classList.add('hidden');
       document.getElementById('screen-results').classList.remove('hidden');
-      document.getElementById('timer-widget').classList.remove('hidden');
+      document.getElementById('timer-fab').classList.remove('hidden');
+      document.getElementById('timer-widget').classList.add('hidden');
       updateTimerUI();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -1343,6 +1348,7 @@ REGLAS CRÍTICAS:
       document.getElementById('screen-error').classList.add('hidden');
       document.getElementById('screen-home').classList.remove('hidden');
       document.getElementById('timer-widget').classList.add('hidden');
+      document.getElementById('timer-fab').classList.add('hidden');
       updateDynamicGreeting();
       renderLastRecipeCard();
       renderFavoritesList();
@@ -1356,6 +1362,7 @@ REGLAS CRÍTICAS:
       document.getElementById('screen-error').classList.add('hidden');
       document.getElementById('screen-loading').classList.remove('hidden');
       document.getElementById('timer-widget').classList.add('hidden');
+      document.getElementById('timer-fab').classList.add('hidden');
     }
 
     function hideLoadingScreen() {
@@ -1368,6 +1375,7 @@ REGLAS CRÍTICAS:
       document.getElementById('screen-loading').classList.add('hidden');
       document.getElementById('screen-error').classList.remove('hidden');
       document.getElementById('timer-widget').classList.add('hidden');
+      document.getElementById('timer-fab').classList.add('hidden');
       document.getElementById('error-message').textContent = message;
       document.getElementById('error-details').textContent = details;
     }
@@ -1418,6 +1426,13 @@ REGLAS CRÍTICAS:
       timerRemainingSeconds = 0;
       document.getElementById('timer-label').textContent = 'Temporizador';
       updateTimerUI();
+    }
+
+    function toggleTimerPanel() {
+      const widget = document.getElementById('timer-widget');
+      const isHidden = widget.classList.contains('hidden');
+      widget.classList.toggle('hidden', !isHidden);
+      document.getElementById('timer-fab').setAttribute('aria-label', isHidden ? 'Cerrar temporizador' : 'Abrir temporizador');
     }
 
     // Wake Lock API

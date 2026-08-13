@@ -1,9 +1,10 @@
-const CACHE_NAME = 'fastcooking-v6';
+const CACHE_NAME = 'fastcooking-v7';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
-  './icon.svg'
+  './icon.svg',
+  './public/recipe-fallback.png'
 ];
 
 self.addEventListener('install', (event) => {
