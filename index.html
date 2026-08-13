@@ -90,6 +90,8 @@
     }
     .timer-preset:active { transform: scale(.95); }
     .timer-preset:hover { background: rgba(255,255,255,.18); }
+    .hide-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
     html.dark {
       background-color: #111111;
       color: #F5F6FA;
@@ -240,16 +242,12 @@
       </form>
 
       <!-- ÚLTIMA RECETA BUSCADA -->
-      <section id="last-recipe-section" class="hidden space-y-3" aria-labelledby="last-recipe-label">
-        <div class="flex items-center justify-between px-1">
-          <span id="last-recipe-label" class="text-[11px] font-extrabold uppercase tracking-[0.16em] text-moon-purple">Última búsqueda</span>
-          <span class="text-[11px] font-semibold text-stone-400">Ábrela y sigue cocinando</span>
-        </div>
+      <section id="last-recipe-section" class="hidden" aria-label="Receta recién buscada">
         <button id="last-recipe-card" type="button" class="relative block h-52 w-full overflow-hidden rounded-[28px] bg-[#1A1A1A] text-left shadow-xl active:scale-[0.98] transition-transform">
           <img id="last-recipe-image" class="absolute inset-0 h-full w-full object-cover" alt="" />
           <div class="absolute inset-0 bg-gradient-to-r from-black/95 via-black/60 to-black/15"></div>
           <div class="relative flex h-full w-[68%] flex-col justify-end p-5">
-            <span class="mb-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-moon-purple">Receta destacada</span>
+            <span class="mb-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-moon-purple">Recién buscada</span>
             <h3 id="last-recipe-title" class="font-display text-2xl font-extrabold leading-[1.02] text-white"></h3>
             <p id="last-recipe-meta" class="mt-2 text-xs font-medium text-stone-300"></p>
             <span class="mt-4 inline-flex w-fit items-center rounded-xl bg-moon-purple px-3 py-2 text-[11px] font-bold text-white">Abrir receta →</span>
@@ -266,7 +264,7 @@
           </span>
           <span class="text-[11px] font-semibold text-stone-400 dark:text-stone-500">Últimas 10 · 3 meses</span>
         </div>
-        <div id="recent-searches-list" class="flex flex-col gap-2.5"></div>
+        <div id="recent-searches-list" class="hide-scrollbar -mr-3 flex snap-x gap-3 overflow-x-auto pr-3"></div>
       </section>
 
       <!-- SECCIÓN DE FAVORITOS PERSISTENTES -->
@@ -279,7 +277,7 @@
           <span id="favs-count" class="text-[11px] font-semibold text-stone-400 dark:text-stone-500">0 guardadas</span>
         </div>
         
-        <div id="favorites-list" class="flex flex-col gap-2.5">
+        <div id="favorites-list" class="hide-scrollbar -mr-3 flex snap-x gap-3 overflow-x-auto pr-3">
           <!-- Renderizado dinámico de favoritos -->
         </div>
       </div>
@@ -693,7 +691,7 @@
 
       if (favs.length === 0) {
         listContainer.innerHTML = `
-          <div class="p-4 rounded-2xl bg-stone-100/70 dark:bg-stone-900/50 border border-dashed border-stone-200 dark:border-stone-800 text-stone-400 dark:text-stone-500 text-xs text-center font-medium">
+          <div class="py-2 text-stone-400 dark:text-stone-500 text-xs font-medium">
             Aún no tienes recetas favoritas. Busca cualquier plato y toca guardar.
           </div>
         `;
@@ -705,26 +703,12 @@
         if (!recipe) return '';
         const encodedKey = encodeURIComponent(key);
         return `
-          <div 
-            onclick="renderRecipeDirectly(decodeURIComponent('${encodedKey}'))"
-            class="flex items-center justify-between py-2.5 cursor-pointer active:scale-[0.98] transition-all group"
-          >
-            <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 rounded-2xl bg-stone-800 overflow-hidden shrink-0">
-                <img src="${getRecipeImage(recipe)}" onerror="this.onerror=null;this.src='public/recipe-fallback.png'" alt="" class="w-full h-full object-cover" />
-              </div>
-              <div class="text-left">
-                <h4 class="font-display font-extrabold text-sm text-stone-900 dark:text-stone-100 group-hover:text-moon-purple transition-colors">
-                  ${escapeHtml(recipe.title)}
-                </h4>
-                <p class="text-[11px] text-stone-400 font-medium">${escapeHtml(recipe.author)}</p>
-              </div>
-            </div>
-            <div class="flex items-center space-x-2">
-              <span class="text-amber-400 text-sm">★</span>
-              <span class="text-stone-400 group-hover:text-moon-purple text-xs font-bold">Ver ➔</span>
-            </div>
-          </div>
+          <button type="button" onclick="renderRecipeDirectly(decodeURIComponent('${encodedKey}'))" class="group w-32 shrink-0 snap-start text-left active:scale-[0.97] transition-transform">
+            <span class="block aspect-square overflow-hidden rounded-2xl bg-stone-800">
+              <img src="${getRecipeImage(recipe)}" onerror="this.onerror=null;this.src='public/recipe-fallback.png'" alt="" class="h-full w-full object-cover" />
+            </span>
+            <span class="mt-2 block line-clamp-2 font-display text-sm font-extrabold leading-tight text-stone-100 group-hover:text-moon-purple transition-colors">${escapeHtml(recipe.title)}</span>
+          </button>
         `;
       }).join('');
     }
@@ -752,15 +736,9 @@
         const recipe = recipes[item.key];
         const encodedKey = encodeURIComponent(item.key);
         return `
-          <button type="button" onclick="renderRecipeDirectly(decodeURIComponent('${encodedKey}'))" class="flex items-center justify-between py-2.5 text-left active:scale-[0.98] transition-all group">
-            <span class="flex min-w-0 items-center space-x-3">
-              <span class="w-10 h-10 rounded-2xl bg-stone-800 overflow-hidden shrink-0"><img src="${getRecipeImage(recipe)}" onerror="this.onerror=null;this.src='public/recipe-fallback.png'" alt="" class="w-full h-full object-cover" /></span>
-              <span class="min-w-0">
-                <span class="block truncate font-display font-extrabold text-sm text-stone-900 dark:text-stone-100 group-hover:text-moon-purple transition-colors">${escapeHtml(recipe.title)}</span>
-                <span class="block truncate text-[11px] text-stone-400 font-medium">${recentSearchLabel(item.consultedAt)}</span>
-              </span>
-            </span>
-            <span class="ml-3 shrink-0 text-xs font-bold text-moon-purple">Ver →</span>
+          <button type="button" onclick="renderRecipeDirectly(decodeURIComponent('${encodedKey}'))" class="group w-32 shrink-0 snap-start text-left active:scale-[0.97] transition-transform">
+            <span class="block aspect-square overflow-hidden rounded-2xl bg-stone-800"><img src="${getRecipeImage(recipe)}" onerror="this.onerror=null;this.src='public/recipe-fallback.png'" alt="" class="h-full w-full object-cover" /></span>
+            <span class="mt-2 block line-clamp-2 font-display text-sm font-extrabold leading-tight text-stone-100 group-hover:text-moon-purple transition-colors">${escapeHtml(recipe.title)}</span>
           </button>
         `;
       }).join('');
