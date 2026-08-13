@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>FastCooking - Recetas Rápidas con Gemini</title>
+  <title>Recetario Magistral</title>
   
   <!-- PWA Meta Tags -->
   <link rel="manifest" href="manifest.json">
@@ -71,7 +71,9 @@
       -webkit-tap-highlight-color: transparent;
       font-family: 'DM Sans', sans-serif;
       transition: background-color 0.35s ease, color 0.35s ease;
+      scrollbar-width: none;
     }
+    body::-webkit-scrollbar { display: none; }
     .font-display {
       font-family: 'Outfit', sans-serif;
     }
@@ -116,7 +118,7 @@
     <div class="flex items-center space-x-2.5 cursor-pointer group" onclick="showHomeScreen()">
       <img src="public/app-icon-pot.png" alt="" class="w-10 h-10 rounded-2xl object-cover bg-[#1A1A1A] shadow-lg shadow-moon-purple/20 group-active:scale-95 transition-transform" />
       <div class="flex flex-col">
-        <span class="font-display text-xl font-extrabold tracking-tight text-white leading-none">Fast<span class="text-moon-purple">Cooking</span></span>
+        <span class="font-display text-lg font-extrabold tracking-tight text-white leading-none">Recetario <span class="text-moon-purple">Magistral</span></span>
       </div>
     </div>
     <div class="relative">
@@ -211,7 +213,7 @@
       <div class="pt-1 text-left">
         <div class="flex items-center justify-between">
           <h2 id="greeting-title" class="font-display text-3xl sm:text-4xl font-extrabold text-stone-900 dark:text-white tracking-tight">
-            ¡Buenas tardes, Ricardo! 🍳
+            Bon appetit Ricardo!
           </h2>
         </div>
       </div>
@@ -285,13 +287,13 @@
     </section>
 
     <!-- 2. PANTALLA DE RESULTADOS (RESULTS SCREEN) -->
-    <section id="screen-results" class="hidden space-y-6 pb-12 animate-fadeIn">
+    <section id="screen-results" class="hidden space-y-5 pb-12 animate-fadeIn">
 
       <!-- Barra superior de navegación -->
       <div class="flex items-center justify-between pt-2">
         <button 
           onclick="showHomeScreen()" 
-          class="inline-flex items-center space-x-2 px-4 py-2.5 rounded-full bg-white dark:bg-[#181C33] border border-stone-200 dark:border-stone-800 text-stone-800 dark:text-stone-200 text-xs font-bold hover:border-moon-purple/50 active:scale-95 transition-all shadow-sm"
+          class="inline-flex items-center space-x-2 py-2 text-stone-300 text-xs font-bold hover:text-moon-purple active:scale-95 transition-all"
         >
           <svg class="w-4 h-4 text-moon-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -303,20 +305,19 @@
         <button 
           id="fav-toggle-btn"
           onclick="toggleCurrentFavorite()"
-          class="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full bg-white dark:bg-[#181C33] border border-stone-200 dark:border-stone-800 text-amber-500 text-xs font-bold active:scale-95 transition-all shadow-sm"
+          class="inline-flex items-center space-x-1.5 py-2 text-amber-500 text-xs font-bold active:scale-95 transition-all"
         >
           <span id="fav-star-icon">☆</span>
           <span id="fav-star-text">Guardar</span>
         </button>
       </div>
 
-      <!-- TARJETA PRINCIPAL DE LA RECETA (SILENT MOON HERO CARD) -->
-      <article class="rounded-[32px] bg-white dark:bg-[#181C33] border border-stone-200/80 dark:border-stone-800 p-6 shadow-xl space-y-6">
+      <article class="space-y-5">
         
         <!-- Encabezado Receta -->
-        <div class="border-b border-stone-100 dark:border-stone-800/80 pb-5 space-y-3">
+        <div class="border-b border-stone-800/80 pb-4 space-y-3">
           <div class="flex items-center justify-between">
-            <span class="inline-flex items-center space-x-1.5 px-3.5 py-1 rounded-full bg-moon-purple/10 text-moon-purple text-xs font-extrabold uppercase tracking-wider">
+            <span class="inline-flex items-center space-x-1.5 text-moon-purple text-[10px] font-extrabold uppercase tracking-wider">
               <span class="w-2 h-2 rounded-full bg-moon-purple animate-pulse"></span>
               <span>Oficial de Álvaro Barrientos</span>
             </span>
@@ -325,7 +326,7 @@
               href="#" 
               target="_blank" 
               rel="noopener"
-              class="inline-flex items-center space-x-1.5 px-4 py-2 rounded-full bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs font-bold hover:bg-red-500/20 active:scale-95 transition-all"
+              class="inline-flex items-center space-x-1.5 py-1 text-red-400 text-xs font-bold hover:text-red-300 active:scale-95 transition-all"
             >
               <svg class="w-4 h-4 fill-current text-red-600 dark:text-red-500" viewBox="0 0 24 24">
                 <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
@@ -344,43 +345,43 @@
           </p>
 
           <div class="flex items-center justify-between gap-3 pt-1">
-            <div id="recipe-thumbnail" class="hidden overflow-hidden rounded-2xl border border-stone-200 dark:border-stone-700 shrink-0">
+            <div id="recipe-thumbnail" class="hidden overflow-hidden rounded-xl shrink-0">
               <img id="recipe-thumbnail-img" class="h-16 w-28 object-cover" alt="Miniatura del video de la receta" loading="lazy" />
             </div>
-            <div class="ml-auto flex items-center gap-2 rounded-2xl bg-stone-100 dark:bg-stone-900 px-2 py-1.5 border border-stone-200 dark:border-stone-800">
-              <button type="button" onclick="changeServings(-1)" aria-label="Reducir porciones" class="w-8 h-8 rounded-xl text-moon-purple font-extrabold hover:bg-white dark:hover:bg-[#181C33] active:scale-90 transition">−</button>
+            <div class="ml-auto flex items-center gap-2 px-1 py-1">
+              <button type="button" onclick="changeServings(-1)" aria-label="Reducir porciones" class="w-7 h-7 text-moon-purple font-extrabold active:scale-90 transition">−</button>
               <span id="servings-display" class="min-w-20 text-center text-xs font-bold text-stone-700 dark:text-stone-200">4 porciones</span>
-              <button type="button" onclick="changeServings(1)" aria-label="Aumentar porciones" class="w-8 h-8 rounded-xl text-moon-purple font-extrabold hover:bg-white dark:hover:bg-[#181C33] active:scale-90 transition">+</button>
+              <button type="button" onclick="changeServings(1)" aria-label="Aumentar porciones" class="w-7 h-7 text-moon-purple font-extrabold active:scale-90 transition">+</button>
             </div>
           </div>
         </div>
 
         <!-- SECCIONES PLEGABLES -->
-        <details open class="group rounded-2xl border border-stone-200/70 dark:border-stone-800 bg-stone-50/70 dark:bg-[#151515]">
-          <summary class="flex cursor-pointer list-none items-center justify-between gap-3 p-4">
+        <details open class="group border-b border-stone-800/80">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-3 py-3">
             <h3 class="font-display text-lg font-extrabold text-stone-900 dark:text-white">🛒 Ingredientes · Mise en place</h3>
             <span class="flex items-center gap-2"><span id="ing-progress-badge" class="text-[11px] font-bold text-moon-purple bg-moon-purple/10 px-2.5 py-0.5 rounded-full">0 listos</span><span class="text-moon-purple transition-transform group-open:rotate-180">⌄</span></span>
           </summary>
-          <ul id="ingredients-list" class="space-y-2.5 px-4 pb-4 text-sm text-stone-800 dark:text-stone-200"></ul>
+          <ul id="ingredients-list" class="space-y-1 pb-4 text-sm text-stone-800 dark:text-stone-200"></ul>
         </details>
 
-        <details class="group rounded-2xl border border-stone-200/70 dark:border-stone-800 bg-stone-50/70 dark:bg-[#151515]">
-          <summary class="flex cursor-pointer list-none items-center justify-between gap-3 p-4">
+        <details class="group border-b border-stone-800/80">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-3 py-3">
             <h3 class="font-display text-lg font-extrabold text-stone-900 dark:text-white">▶ Vínculos al video</h3>
             <span class="text-moon-purple transition-transform group-open:rotate-180">⌄</span>
           </summary>
-          <div id="tips-list" class="space-y-2.5 px-4 pb-4"></div>
+          <div id="tips-list" class="space-y-2 pb-4"></div>
         </details>
 
       </article>
 
       <!-- SECCIÓN SECUNDARIA: ALTERNATIVAS DE OTROS YOUTUBERS -->
-      <details class="group rounded-2xl border border-stone-200/70 dark:border-stone-800 bg-white dark:bg-[#1A1A1A]">
-        <summary class="flex cursor-pointer list-none items-center justify-between gap-3 p-4">
+      <details class="group border-b border-stone-800/80">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-3 py-3">
           <h3 class="font-display text-sm font-extrabold uppercase tracking-wider text-stone-500 dark:text-stone-400">Otras alternativas en YouTube</h3>
           <span class="text-moon-purple transition-transform group-open:rotate-180">⌄</span>
         </summary>
-        <div id="alternatives-list" class="space-y-3 px-4 pb-4"></div>
+        <div id="alternatives-list" class="space-y-3 pb-4"></div>
       </details>
 
     </section>
@@ -446,8 +447,8 @@
   </dialog>
 
   <!-- Footer Minimalista -->
-  <footer class="py-4 text-center text-[11px] text-stone-400 dark:text-stone-500 border-t border-stone-200/60 dark:border-stone-800/60 transition-colors">
-    <p>FastCooking PWA &bull; Tu asistente en la cocina con Gemini 3.6 Flash</p>
+  <footer class="py-4 text-center text-[11px] text-stone-500 transition-colors">
+    <p>Recetario Magistral</p>
   </footer>
 
   <!-- JAVASCRIPT LOGIC -->
@@ -465,11 +466,11 @@
       if (!greetingEl) return;
 
       if (hour >= 6 && hour < 13) {
-        greetingEl.textContent = '¡Buenos días, Ricardo! 🍳';
+        greetingEl.textContent = 'Bon appetit Ricardo!';
       } else if (hour >= 13 && hour < 20) {
-        greetingEl.textContent = '¡Buenas tardes, Ricardo! 🥘';
+        greetingEl.textContent = 'Bon appetit Ricardo!';
       } else {
-        greetingEl.textContent = '¡Buenas noches, Ricardo! 🍷';
+        greetingEl.textContent = 'Bon appetit Ricardo!';
       }
     }
 
@@ -682,11 +683,11 @@
       if (currentRecipeKey && isFavorite(currentRecipeKey)) {
         icon.textContent = '★';
         text.textContent = 'Guardada';
-        btn.className = "inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-bold active:scale-95 transition-all shadow-sm";
+        btn.className = "inline-flex items-center space-x-1.5 py-2 text-amber-400 text-xs font-bold active:scale-95 transition-all";
       } else {
         icon.textContent = '☆';
         text.textContent = 'Guardar';
-        btn.className = "inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-full bg-white dark:bg-[#181C33] border border-stone-200 dark:border-stone-800 text-amber-500 text-xs font-bold active:scale-95 transition-all shadow-sm";
+        btn.className = "inline-flex items-center space-x-1.5 py-2 text-amber-500 text-xs font-bold active:scale-95 transition-all";
       }
     }
 
@@ -1184,7 +1185,7 @@ REGLAS CRÍTICAS:
       const factor = currentServings / (Number(currentRecipe.servings) || 4);
       const ingredientsContainer = document.getElementById('ingredients-list');
       ingredientsContainer.innerHTML = (currentRecipe.ingredients || []).map((ingredient, idx) => `
-        <li class="flex items-start space-x-3 p-3.5 rounded-2xl bg-stone-50 dark:bg-[#1C203B] border border-stone-200/70 dark:border-stone-800 hover:border-moon-purple/50 transition-colors cursor-pointer">
+        <li class="flex items-start space-x-3 py-2 cursor-pointer">
           <input type="checkbox" id="ing-${idx}" onchange="updateIngredientsProgress()" class="ingredient-checkbox mt-0.5 w-4.5 h-4.5 rounded-md border-stone-300 dark:border-stone-600 text-moon-purple focus:ring-moon-purple focus:ring-offset-stone-900 bg-stone-100 dark:bg-stone-800 cursor-pointer" />
           <label for="ing-${idx}" class="cursor-pointer select-none text-stone-800 dark:text-stone-200 flex-1 text-xs sm:text-sm font-medium leading-normal"><span>${escapeHtml(scaleIngredient(ingredient, factor))}</span></label>
         </li>
@@ -1247,7 +1248,7 @@ REGLAS CRÍTICAS:
             href="${ytTimeLink}" 
             target="_blank" 
             rel="noopener"
-            class="group block p-4 rounded-2xl bg-stone-50 dark:bg-[#1C203B] border border-stone-200/70 dark:border-stone-800 hover:border-moon-purple/50 hover:bg-white dark:hover:bg-[#212647] active:scale-[0.98] transition-all shadow-sm"
+            class="group block py-3 border-b border-stone-800/80 last:border-0 active:opacity-70 transition-all"
           >
             <div class="flex items-start space-x-3">
               <span class="inline-flex items-center px-3 py-1 rounded-xl bg-moon-purple/10 text-moon-purple font-mono text-xs font-bold border border-moon-purple/20 group-hover:bg-moon-purple group-hover:text-white transition-colors shrink-0">
@@ -1264,7 +1265,7 @@ REGLAS CRÍTICAS:
       // Renderizar Alternativas
       const alternativesContainer = document.getElementById('alternatives-list');
       alternativesContainer.innerHTML = (data.alternatives || []).map(alt => `
-        <div class="p-4 rounded-3xl bg-[#E8EAFF]/60 dark:bg-[#1C203B] border border-indigo-200/60 dark:border-indigo-500/20 space-y-2">
+        <div class="py-3 border-b border-stone-800/80 last:border-0 space-y-2">
           <h4 class="font-display text-sm font-extrabold text-indigo-900 dark:text-indigo-200">
             ${escapeHtml(alt.style)}
           </h4>
@@ -1355,7 +1356,7 @@ REGLAS CRÍTICAS:
           timerInterval = null;
           document.getElementById('timer-label').textContent = '¡Tiempo cumplido!';
           if ('vibrate' in navigator) navigator.vibrate([250, 120, 250, 120, 500]);
-          if ('Notification' in window && Notification.permission === 'granted') new Notification('FastCooking', { body: '¡Tu temporizador terminó!' });
+          if ('Notification' in window && Notification.permission === 'granted') new Notification('Recetario Magistral', { body: '¡Tu temporizador terminó!' });
           alert('¡Tu temporizador terminó!');
           updateTimerUI();
         }

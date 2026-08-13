@@ -1,6 +1,6 @@
 {
-  "name": "FastCooking - Recetas Rápidas",
-  "short_name": "FastCooking",
+  "name": "Recetario Magistral",
+  "short_name": "Recetario",
   "description": "Recetas optimizadas con tips directo a YouTube para cocinar al instante.",
   "start_url": "./index.html",
   "display": "standalone",
