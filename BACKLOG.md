@@ -8,13 +8,13 @@ Este documento registra y organiza las ideas de mejora, nuevas características 
 
 | Característica / Tarea | Prioridad | Dificultad Técnica | Estado | Descripción / Notas |
 | :--- | :---: | :---: | :---: | :--- |
-| **Bucle de Recarga de Service Worker** | 🔥 Alta | 🟢 Baja | ⏳ Pendiente | Evitar recargas infinitas o innecesarias al actualizar la API Key. |
-| **Búsqueda Histórica y Ciclo de 6 Meses** | 🔥 Alta | 🟡 Media | ⏳ Pendiente | Guardar todas las búsquedas en `localStorage` y priorizarlas al buscar. Auto-limpiar recetas no consultadas en 6 meses. Solo los favoritos persisten por siempre. |
-| **Cómputo de Porciones Dinámico** | 🔥 Alta | 🟡 Media | ⏳ Pendiente | Botón `+/-` para ajustar las porciones (ej: de 4 a 2 o 6 personas) y recalcular automáticamente las cantidades de los ingredientes. |
-| **Temporizador Interno (Timer)** | 🟡 Media | 🟡 Media | ⏳ Pendiente | Reloj/alarma flotante integrado en la app para programar alertas de cocción (ej: los "25 minutos en olla a presión"). |
+| **Bucle de Recarga de Service Worker** | 🔥 Alta | 🟢 Baja | ✅ Implementado | Guardar la API Key ya no desregistra el Service Worker ni fuerza una recarga. |
+| **Búsqueda Histórica y Ciclo de 6 Meses** | 🔥 Alta | 🟡 Media | ✅ Implementado | Las 10 búsquedas recientes se reutilizan antes de consultar Gemini y persisten 3 meses; las favoritas no expiran. |
+| **Cómputo de Porciones Dinámico** | 🔥 Alta | 🟡 Media | ✅ Implementado | Controles `+/-` ajustan las cantidades iniciales de ingredientes numéricos. |
+| **Temporizador Interno (Timer)** | 🟡 Media | 🟡 Media | ✅ Implementado | Temporizador flotante con presets, pausa, vibración y notificación cuando el navegador lo permite. |
 | **Rediseño de la Interfaz (UI/UX)** | 🟡 Media | 🟡 Media | ⏳ Pendiente | Pulir el diseño visual, espaciados y jerarquía tipográfica para que sea más premium y fácil de leer mientras se cocina. |
 | **Modo Oscuro y Automático (System)** | 🟡 Media | 🟢 Baja | ⏳ Pendiente | Soporte para tema oscuro basado en la preferencia del sistema operativo del celular. |
-| **Miniatura / Portada de YouTube** | 🟢 Baja | 🟢 Baja | ⏳ Pendiente | Cargar la miniatura real del video de YouTube (`https://img.youtube.com/vi/ID/0.jpg`) como portada de la receta. |
+| **Miniatura / Portada de YouTube** | 🟢 Baja | 🟢 Baja | ✅ Implementado | La ficha muestra la miniatura real del video cuando se detecta un enlace válido de YouTube. |
 | **Enlaces a Recetas de Alternativas** | 🟢 Baja | 🟢 Baja | ⏳ Pendiente | Extraer y adjuntar los enlaces de YouTube o web para los YouTubers sugeridos en la sección secundaria. |
 | **Compartir Receta (WhatsApp/Copy)** | 🟢 Baja | 🟢 Baja | ⏳ Pendiente | Botón para copiar ingredientes o enviar el enlace directo de la receta con un toque. |
 | **Modularización de Archivos** | 🟢 Baja | 🟢 Baja | ⏳ Pendiente | Separar el JavaScript de `index.html` en un archivo `app.js` dedicado para facilitar mantenimiento y orden en el repositorio. |

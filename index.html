@@ -79,6 +79,17 @@
       text-decoration: line-through;
       opacity: 0.45;
     }
+    .timer-preset {
+      flex: 1;
+      border-radius: 0.75rem;
+      background: rgba(255,255,255,.1);
+      padding: .5rem .25rem;
+      font-size: 11px;
+      font-weight: 700;
+      transition: background-color .2s ease, transform .2s ease;
+    }
+    .timer-preset:active { transform: scale(.95); }
+    .timer-preset:hover { background: rgba(255,255,255,.18); }
     /* Estilos base de temas inspirados en Silent Moon */
     html.dark {
       background-color: #0C0F1D;
@@ -323,6 +334,18 @@
         </div>
       </div>
 
+      <!-- BÚSQUEDAS RECIENTES -->
+      <section id="recent-searches-section" class="hidden w-full space-y-3 pt-1" aria-labelledby="recent-searches-title">
+        <div class="flex items-center justify-between px-1">
+          <span id="recent-searches-title" class="text-xs font-extrabold uppercase tracking-wider text-stone-400 dark:text-stone-500 flex items-center space-x-1.5">
+            <span>🕘</span>
+            <span>Búsquedas recientes</span>
+          </span>
+          <span class="text-[11px] font-semibold text-stone-400 dark:text-stone-500">Últimas 10 · 3 meses</span>
+        </div>
+        <div id="recent-searches-list" class="flex flex-col gap-2.5"></div>
+      </section>
+
       <!-- SECCIÓN DE FAVORITOS PERSISTENTES -->
       <div id="favorites-section" class="w-full space-y-3 pt-2">
         <div class="flex items-center justify-between px-1">
@@ -398,6 +421,17 @@
             <span>👨‍🍳</span>
             <span id="recipe-author-text">Por Álvaro Barrientos Montero</span>
           </p>
+
+          <div class="flex items-center justify-between gap-3 pt-1">
+            <div id="recipe-thumbnail" class="hidden overflow-hidden rounded-2xl border border-stone-200 dark:border-stone-700 shrink-0">
+              <img id="recipe-thumbnail-img" class="h-16 w-28 object-cover" alt="Miniatura del video de la receta" loading="lazy" />
+            </div>
+            <div class="ml-auto flex items-center gap-2 rounded-2xl bg-stone-100 dark:bg-stone-900 px-2 py-1.5 border border-stone-200 dark:border-stone-800">
+              <button type="button" onclick="changeServings(-1)" aria-label="Reducir porciones" class="w-8 h-8 rounded-xl text-moon-purple font-extrabold hover:bg-white dark:hover:bg-[#181C33] active:scale-90 transition">−</button>
+              <span id="servings-display" class="min-w-20 text-center text-xs font-bold text-stone-700 dark:text-stone-200">4 porciones</span>
+              <button type="button" onclick="changeServings(1)" aria-label="Aumentar porciones" class="w-8 h-8 rounded-xl text-moon-purple font-extrabold hover:bg-white dark:hover:bg-[#181C33] active:scale-90 transition">+</button>
+            </div>
+          </div>
         </div>
 
         <!-- SECCIÓN 1: INGREDIENTES CON PROGRESS COUNTER -->
@@ -449,6 +483,25 @@
 
   </main>
 
+  <!-- TEMPORIZADOR DE COCINA -->
+  <section id="timer-widget" class="hidden fixed bottom-5 left-4 right-4 z-40 max-w-md mx-auto rounded-3xl bg-[#1E2442] text-white p-4 shadow-2xl shadow-moon-purple/30">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-2xl bg-white/15 flex items-center justify-center text-lg">⏲️</div>
+      <div class="flex-1">
+        <p id="timer-label" class="text-[11px] font-semibold text-white/70">Temporizador</p>
+        <p id="timer-display" class="font-display text-2xl font-extrabold tracking-wider">00:00</p>
+      </div>
+      <button id="timer-start-btn" type="button" onclick="toggleTimer()" class="px-4 py-2.5 rounded-2xl bg-moon-purple text-xs font-bold active:scale-95 transition">Iniciar</button>
+      <button type="button" onclick="resetTimer()" aria-label="Reiniciar temporizador" class="w-9 h-9 rounded-xl bg-white/10 text-white/80 active:scale-95 transition">↺</button>
+    </div>
+    <div class="mt-3 flex gap-2">
+      <button type="button" onclick="setTimerMinutes(5)" class="timer-preset">5 min</button>
+      <button type="button" onclick="setTimerMinutes(10)" class="timer-preset">10 min</button>
+      <button type="button" onclick="setTimerMinutes(25)" class="timer-preset">25 min</button>
+      <button type="button" onclick="setTimerMinutes(40)" class="timer-preset">40 min</button>
+    </div>
+  </section>
+
   <!-- MODAL CONFIGURACIÓN API KEY -->
   <dialog id="apikey-modal" class="rounded-[32px] bg-white dark:bg-[#181C33] border border-stone-200 dark:border-stone-800 p-6 text-stone-900 dark:text-white max-w-sm w-full backdrop:bg-stone-950/75 shadow-2xl focus:outline-none">
     <div class="space-y-4">
@@ -495,6 +548,10 @@
   <!-- JAVASCRIPT LOGIC -->
   <script>
     let currentRecipeKey = null;
+    let currentRecipe = null;
+    let currentServings = 4;
+    let timerRemainingSeconds = 0;
+    let timerInterval = null;
 
     // GREETING DINÁMICO SEGÚN LA HORA DEL DÍA (SILENT MOON STYLE)
     function updateDynamicGreeting() {
@@ -560,17 +617,7 @@
       }
       localStorage.setItem('fastcooking_gemini_key', key);
       closeApiKeyModal();
-      
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(registrations => {
-          for(let reg of registrations) {
-            reg.unregister();
-          }
-        });
-      }
-
       alert("API Key de Gemini configurada con éxito.");
-      window.location.reload();
     }
 
     function openApiKeyModal() {
@@ -630,12 +677,86 @@
       }
     }
 
+    function getRecentSearches() {
+      try {
+        const stored = localStorage.getItem('fastcooking_recent_searches');
+        return stored ? JSON.parse(stored) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveRecentSearches(searches) {
+      localStorage.setItem('fastcooking_recent_searches', JSON.stringify(searches));
+    }
+
+    function cleanRecipeHistory() {
+      const threeMonthsAgo = Date.now() - (1000 * 60 * 60 * 24 * 92);
+      const favorites = new Set(getFavorites());
+      const validRecent = getRecentSearches()
+        .filter(item => item && item.key && item.consultedAt >= threeMonthsAgo)
+        .sort((a, b) => b.consultedAt - a.consultedAt)
+        .slice(0, 10);
+      const cachedKeys = new Set(validRecent.map(item => item.key));
+      saveRecentSearches(validRecent);
+
+      const recipes = getCustomStoredRecipes();
+      let changed = false;
+      Object.keys(recipes).forEach(key => {
+        if (!favorites.has(key) && !cachedKeys.has(key)) {
+          delete recipes[key];
+          changed = true;
+        }
+      });
+      if (changed) localStorage.setItem('fastcooking_custom_recipes', JSON.stringify(recipes));
+      return validRecent;
+    }
+
     function saveCustomRecipe(recipeObj) {
       try {
         const customs = getCustomStoredRecipes();
-        customs[recipeObj.key] = recipeObj;
+        const previous = customs[recipeObj.key] || {};
+        customs[recipeObj.key] = {
+          ...previous,
+          ...recipeObj,
+          lastConsulted: Date.now(),
+          createdAt: previous.createdAt || Date.now()
+        };
         localStorage.setItem('fastcooking_custom_recipes', JSON.stringify(customs));
       } catch (e) {}
+    }
+
+    function recordRecentSearch(recipe) {
+      if (!recipe?.key) return;
+      const now = Date.now();
+      const recent = getRecentSearches().filter(item => item.key !== recipe.key);
+      recent.unshift({ key: recipe.key, consultedAt: now });
+      saveRecentSearches(recent.slice(0, 10));
+      cleanRecipeHistory();
+    }
+
+    function findStoredRecipe(query) {
+      const normalizedQuery = normalizeText(query);
+      const recipes = getCustomStoredRecipes();
+      const allowedKeys = new Set([
+        ...getFavorites(),
+        ...cleanRecipeHistory().map(item => item.key)
+      ]);
+      const exact = allowedKeys.has(normalizedQuery) ? recipes[normalizedQuery] : null;
+      if (exact) return exact;
+      const candidates = Object.entries(recipes)
+        .filter(([key]) => allowedKeys.has(key))
+        .map(([, recipe]) => recipe)
+        .filter(recipe => {
+          const title = normalizeText(recipe.title);
+          return title && (title.includes(normalizedQuery) || normalizedQuery.includes(title));
+        })
+        .sort((a, b) => (b.lastConsulted || 0) - (a.lastConsulted || 0));
+      return candidates[0] || null;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>'\"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
     }
 
     function isFavorite(key) {
@@ -651,8 +772,10 @@
         favs.push(currentRecipeKey);
       }
       saveFavorites(favs);
+      cleanRecipeHistory();
       updateFavoriteButtonUI();
       renderFavoritesList();
+      renderRecentSearches();
     }
 
     function updateFavoriteButtonUI() {
@@ -691,9 +814,10 @@
       listContainer.innerHTML = favs.map(key => {
         const recipe = customs[key];
         if (!recipe) return '';
+        const encodedKey = encodeURIComponent(key);
         return `
           <div 
-            onclick="renderRecipeDirectly('${key}')"
+            onclick="renderRecipeDirectly(decodeURIComponent('${encodedKey}'))"
             class="flex items-center justify-between p-3.5 rounded-2xl bg-white dark:bg-[#181C33] border border-stone-200/80 dark:border-stone-800 hover:border-moon-purple/50 cursor-pointer active:scale-[0.98] transition-all shadow-sm group"
           >
             <div class="flex items-center space-x-3">
@@ -702,9 +826,9 @@
               </div>
               <div class="text-left">
                 <h4 class="font-display font-extrabold text-sm text-stone-900 dark:text-stone-100 group-hover:text-moon-purple transition-colors">
-                  ${recipe.title}
+                  ${escapeHtml(recipe.title)}
                 </h4>
-                <p class="text-[11px] text-stone-400 font-medium">${recipe.author}</p>
+                <p class="text-[11px] text-stone-400 font-medium">${escapeHtml(recipe.author)}</p>
               </div>
             </div>
             <div class="flex items-center space-x-2">
@@ -712,6 +836,43 @@
               <span class="text-stone-400 group-hover:text-moon-purple text-xs font-bold">Ver ➔</span>
             </div>
           </div>
+        `;
+      }).join('');
+    }
+
+    function recentSearchLabel(timestamp) {
+      const elapsedHours = Math.floor((Date.now() - timestamp) / (1000 * 60 * 60));
+      if (elapsedHours < 1) return 'Hace un momento';
+      if (elapsedHours < 24) return `Hace ${elapsedHours} h`;
+      const days = Math.floor(elapsedHours / 24);
+      return `Hace ${days} ${days === 1 ? 'día' : 'días'}`;
+    }
+
+    function renderRecentSearches() {
+      const section = document.getElementById('recent-searches-section');
+      const list = document.getElementById('recent-searches-list');
+      const recipes = getCustomStoredRecipes();
+      const recent = cleanRecipeHistory().filter(item => recipes[item.key]);
+      if (!recent.length) {
+        section.classList.add('hidden');
+        list.innerHTML = '';
+        return;
+      }
+      section.classList.remove('hidden');
+      list.innerHTML = recent.map(item => {
+        const recipe = recipes[item.key];
+        const encodedKey = encodeURIComponent(item.key);
+        return `
+          <button type="button" onclick="renderRecipeDirectly(decodeURIComponent('${encodedKey}'))" class="flex items-center justify-between p-3.5 rounded-2xl bg-white dark:bg-[#181C33] border border-stone-200/80 dark:border-stone-800 hover:border-moon-purple/50 text-left active:scale-[0.98] transition-all shadow-sm group">
+            <span class="flex min-w-0 items-center space-x-3">
+              <span class="w-10 h-10 rounded-2xl bg-moon-purple/10 text-moon-purple flex items-center justify-center text-lg shrink-0">🕘</span>
+              <span class="min-w-0">
+                <span class="block truncate font-display font-extrabold text-sm text-stone-900 dark:text-stone-100 group-hover:text-moon-purple transition-colors">${escapeHtml(recipe.title)}</span>
+                <span class="block truncate text-[11px] text-stone-400 font-medium">${recentSearchLabel(item.consultedAt)}</span>
+              </span>
+            </span>
+            <span class="ml-3 shrink-0 text-xs font-bold text-moon-purple">Ver →</span>
+          </button>
         `;
       }).join('');
     }
@@ -793,6 +954,7 @@ Estructura requerida:
 {
   "title": "Nombre de la receta real",
   "author": "Álvaro Barrientos Montero",
+  "servings": 4,
   "baseUrl": "URL watch real de YouTube encontrada",
   "ingredients": [
     "lista de ingredientes reales detallados del video con sus cantidades"
@@ -808,7 +970,8 @@ Estructura requerida:
     {
       "style": "Estilo alternativo de otro YouTuber (ej: Estilo Silvana Cocina)",
       "diff": "Diferencia principal con el método de Álvaro Barrientos",
-      "tip": "Tip principal de esta alternativa"
+      "tip": "Tip principal de esta alternativa",
+      "url": "URL real de YouTube de la alternativa, si está disponible"
     }
   ]
 }
@@ -889,6 +1052,15 @@ REGLAS CRÍTICAS:
       if (event) event.preventDefault();
       const inputVal = document.getElementById('search-input').value.trim();
       if (!inputVal) return;
+
+      const storedRecipe = findStoredRecipe(inputVal);
+      if (storedRecipe) {
+        storedRecipe.lastConsulted = Date.now();
+        saveCustomRecipe(storedRecipe);
+        recordRecentSearch(storedRecipe);
+        renderRecipeUI(storedRecipe);
+        return;
+      }
 
       const apiKey = getApiKey();
       if (!apiKey) {
@@ -986,6 +1158,7 @@ REGLAS CRÍTICAS:
         recipeData.baseUrl = finalUrl;
 
         saveCustomRecipe(recipeData);
+        recordRecentSearch(recipeData);
         renderRecipeUI(recipeData);
 
       } catch (err) {
@@ -1009,8 +1182,55 @@ REGLAS CRÍTICAS:
       const customs = getCustomStoredRecipes();
       const recipe = customs[key];
       if (recipe) {
+        saveCustomRecipe(recipe);
+        recordRecentSearch(recipe);
         renderRecipeUI(recipe);
       }
+    }
+
+    function extractYoutubeVideoId(url) {
+      try {
+        const parsed = new URL(url);
+        if (parsed.hostname === 'youtu.be') return parsed.pathname.slice(1).split('/')[0];
+        if (parsed.hostname.includes('youtube.com')) return parsed.searchParams.get('v');
+      } catch (e) {}
+      return null;
+    }
+
+    function formatNumber(value) {
+      const rounded = Math.round(value * 100) / 100;
+      if (Number.isInteger(rounded)) return String(rounded);
+      return String(rounded).replace('.', ',');
+    }
+
+    function scaleIngredient(ingredient, factor) {
+      const fractions = { '½': 0.5, '¼': 0.25, '¾': 0.75, '⅓': 1 / 3, '⅔': 2 / 3 };
+      const match = String(ingredient).match(/^\s*(?:(\d+(?:[.,]\d+)?)(?:\s+(\d+)\/(\d+))?|(\d+)\/(\d+)|([½¼¾⅓⅔]))(.*)$/);
+      if (!match) return ingredient;
+      let amount = match[1] ? Number(match[1].replace(',', '.')) : 0;
+      if (match[2] && match[3]) amount += Number(match[2]) / Number(match[3]);
+      if (match[4] && match[5]) amount = Number(match[4]) / Number(match[5]);
+      if (match[6]) amount = fractions[match[6]];
+      return `${formatNumber(amount * factor)}${match[7]}`;
+    }
+
+    function renderIngredients() {
+      if (!currentRecipe) return;
+      const factor = currentServings / (Number(currentRecipe.servings) || 4);
+      const ingredientsContainer = document.getElementById('ingredients-list');
+      ingredientsContainer.innerHTML = (currentRecipe.ingredients || []).map((ingredient, idx) => `
+        <li class="flex items-start space-x-3 p-3.5 rounded-2xl bg-stone-50 dark:bg-[#1C203B] border border-stone-200/70 dark:border-stone-800 hover:border-moon-purple/50 transition-colors cursor-pointer">
+          <input type="checkbox" id="ing-${idx}" onchange="updateIngredientsProgress()" class="ingredient-checkbox mt-0.5 w-4.5 h-4.5 rounded-md border-stone-300 dark:border-stone-600 text-moon-purple focus:ring-moon-purple focus:ring-offset-stone-900 bg-stone-100 dark:bg-stone-800 cursor-pointer" />
+          <label for="ing-${idx}" class="cursor-pointer select-none text-stone-800 dark:text-stone-200 flex-1 text-xs sm:text-sm font-medium leading-normal"><span>${escapeHtml(scaleIngredient(ingredient, factor))}</span></label>
+        </li>
+      `).join('');
+      updateIngredientsProgress();
+    }
+
+    function changeServings(change) {
+      currentServings = Math.max(1, Math.min(24, currentServings + change));
+      document.getElementById('servings-display').textContent = `${currentServings} ${currentServings === 1 ? 'porción' : 'porciones'}`;
+      renderIngredients();
     }
 
     // RENDERIZAR RECETA EN PANTALLA
@@ -1018,6 +1238,8 @@ REGLAS CRÍTICAS:
       hideLoadingScreen();
       
       currentRecipeKey = data.key;
+      currentRecipe = data;
+      currentServings = Math.max(1, Number(data.servings) || 4);
 
       const knownFakeIds = ["wX-y0Y1vJ4E", "VIDEO_ID", "ID_REAL", "[VIDEO_ID]", "abcdefghijk", "12345678901"];
       let safeBaseUrl = data.baseUrl || "";
@@ -1026,32 +1248,28 @@ REGLAS CRÍTICAS:
         safeBaseUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
       }
 
-      document.getElementById('recipe-title').textContent = data.title;
-      document.getElementById('recipe-author-text').textContent = `Por ${data.author}`;
+      document.getElementById('recipe-title').textContent = data.title || 'Receta sin nombre';
+      document.getElementById('recipe-author-text').textContent = `Por ${data.author || 'Álvaro Barrientos Montero'}`;
       document.getElementById('main-yt-btn').href = safeBaseUrl;
+      document.getElementById('servings-display').textContent = `${currentServings} ${currentServings === 1 ? 'porción' : 'porciones'}`;
+      const videoId = extractYoutubeVideoId(safeBaseUrl);
+      const thumbnail = document.getElementById('recipe-thumbnail');
+      const thumbnailImg = document.getElementById('recipe-thumbnail-img');
+      if (videoId) {
+        thumbnailImg.src = `https://img.youtube.com/vi/${encodeURIComponent(videoId)}/mqdefault.jpg`;
+        thumbnail.classList.remove('hidden');
+      } else {
+        thumbnailImg.removeAttribute('src');
+        thumbnail.classList.add('hidden');
+      }
 
       updateFavoriteButtonUI();
 
-      // Renderizar Ingredientes con Checkboxes & Counter
-      const ingredientsContainer = document.getElementById('ingredients-list');
-      ingredientsContainer.innerHTML = data.ingredients.map((ing, idx) => `
-        <li class="flex items-start space-x-3 p-3.5 rounded-2xl bg-stone-50 dark:bg-[#1C203B] border border-stone-200/70 dark:border-stone-800 hover:border-moon-purple/50 transition-colors cursor-pointer">
-          <input 
-            type="checkbox" 
-            id="ing-${idx}" 
-            onchange="updateIngredientsProgress()"
-            class="ingredient-checkbox mt-0.5 w-4.5 h-4.5 rounded-md border-stone-300 dark:border-stone-600 text-moon-purple focus:ring-moon-purple focus:ring-offset-stone-900 bg-stone-100 dark:bg-stone-800 cursor-pointer"
-          />
-          <label for="ing-${idx}" class="cursor-pointer select-none text-stone-800 dark:text-stone-200 flex-1 text-xs sm:text-sm font-medium leading-normal">
-            <span>${ing}</span>
-          </label>
-        </li>
-      `).join('');
-      updateIngredientsProgress();
+      renderIngredients();
 
       // Renderizar Tips con Links exactos (&t=X)
       const tipsContainer = document.getElementById('tips-list');
-      tipsContainer.innerHTML = data.tips.map(tip => {
+      tipsContainer.innerHTML = (data.tips || []).map(tip => {
         const ytTimeLink = formatYoutubeTimestampLink(safeBaseUrl, tip.seconds);
         
         return `
@@ -1063,10 +1281,10 @@ REGLAS CRÍTICAS:
           >
             <div class="flex items-start space-x-3">
               <span class="inline-flex items-center px-3 py-1 rounded-xl bg-moon-purple/10 text-moon-purple font-mono text-xs font-bold border border-moon-purple/20 group-hover:bg-moon-purple group-hover:text-white transition-colors shrink-0">
-                ${tip.timestamp} ↗
+                ${escapeHtml(tip.timestamp)} ↗
               </span>
               <p class="text-xs sm:text-sm text-stone-800 dark:text-stone-200 group-hover:text-stone-900 dark:group-hover:text-white transition-colors leading-relaxed font-medium">
-                ${tip.text}
+                ${escapeHtml(tip.text)}
               </p>
             </div>
           </a>
@@ -1075,22 +1293,24 @@ REGLAS CRÍTICAS:
 
       // Renderizar Alternativas
       const alternativesContainer = document.getElementById('alternatives-list');
-      alternativesContainer.innerHTML = data.alternatives.map(alt => `
+      alternativesContainer.innerHTML = (data.alternatives || []).map(alt => `
         <div class="p-4 rounded-3xl bg-[#E8EAFF]/60 dark:bg-[#1C203B] border border-indigo-200/60 dark:border-indigo-500/20 space-y-2">
           <h4 class="font-display text-sm font-extrabold text-indigo-900 dark:text-indigo-200">
-            ${alt.style}
+            ${escapeHtml(alt.style)}
           </h4>
           <p class="text-xs text-stone-600 dark:text-stone-400 leading-relaxed font-medium">
-            <strong class="text-stone-900 dark:text-stone-200 font-bold">Diferencia clave:</strong> ${alt.diff}
+            <strong class="text-stone-900 dark:text-stone-200 font-bold">Diferencia clave:</strong> ${escapeHtml(alt.diff)}
           </p>
           <p class="text-xs text-moon-purple leading-relaxed pt-1 font-medium">
-            <strong class="font-bold">💡 Tip principal:</strong> ${alt.tip}
+            <strong class="font-bold">💡 Tip principal:</strong> ${escapeHtml(alt.tip)}
           </p>
         </div>
       `).join('');
 
       document.getElementById('screen-home').classList.add('hidden');
       document.getElementById('screen-results').classList.remove('hidden');
+      document.getElementById('timer-widget').classList.remove('hidden');
+      updateTimerUI();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -1099,8 +1319,10 @@ REGLAS CRÍTICAS:
       document.getElementById('screen-loading').classList.add('hidden');
       document.getElementById('screen-error').classList.add('hidden');
       document.getElementById('screen-home').classList.remove('hidden');
+      document.getElementById('timer-widget').classList.add('hidden');
       updateDynamicGreeting();
       renderFavoritesList();
+      renderRecentSearches();
       document.getElementById('search-input').focus();
     }
 
@@ -1109,6 +1331,7 @@ REGLAS CRÍTICAS:
       document.getElementById('screen-results').classList.add('hidden');
       document.getElementById('screen-error').classList.add('hidden');
       document.getElementById('screen-loading').classList.remove('hidden');
+      document.getElementById('timer-widget').classList.add('hidden');
     }
 
     function hideLoadingScreen() {
@@ -1120,8 +1343,57 @@ REGLAS CRÍTICAS:
       document.getElementById('screen-results').classList.add('hidden');
       document.getElementById('screen-loading').classList.add('hidden');
       document.getElementById('screen-error').classList.remove('hidden');
+      document.getElementById('timer-widget').classList.add('hidden');
       document.getElementById('error-message').textContent = message;
       document.getElementById('error-details').textContent = details;
+    }
+
+    function updateTimerUI() {
+      const minutes = Math.floor(timerRemainingSeconds / 60);
+      const seconds = timerRemainingSeconds % 60;
+      document.getElementById('timer-display').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      document.getElementById('timer-start-btn').textContent = timerInterval ? 'Pausar' : (timerRemainingSeconds ? 'Iniciar' : 'Elige tiempo');
+    }
+
+    function setTimerMinutes(minutes) {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = null;
+      timerRemainingSeconds = minutes * 60;
+      document.getElementById('timer-label').textContent = `Alarma en ${minutes} minutos`;
+      updateTimerUI();
+    }
+
+    function toggleTimer() {
+      if (!timerRemainingSeconds && !timerInterval) return;
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        updateTimerUI();
+        return;
+      }
+      if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+      timerInterval = setInterval(() => {
+        timerRemainingSeconds = Math.max(0, timerRemainingSeconds - 1);
+        updateTimerUI();
+        if (timerRemainingSeconds === 0) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          document.getElementById('timer-label').textContent = '¡Tiempo cumplido!';
+          if ('vibrate' in navigator) navigator.vibrate([250, 120, 250, 120, 500]);
+          if ('Notification' in window && Notification.permission === 'granted') new Notification('FastCooking', { body: '¡Tu temporizador terminó!' });
+          alert('¡Tu temporizador terminó!');
+          updateTimerUI();
+        }
+      }, 1000);
+      updateTimerUI();
+    }
+
+    function resetTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = null;
+      timerRemainingSeconds = 0;
+      document.getElementById('timer-label').textContent = 'Temporizador';
+      updateTimerUI();
     }
 
     // Wake Lock API
@@ -1227,8 +1499,10 @@ REGLAS CRÍTICAS:
 
     document.addEventListener('DOMContentLoaded', () => {
       initTheme();
+      cleanRecipeHistory();
       updateDynamicGreeting();
       renderFavoritesList();
+      renderRecentSearches();
     });
   </script>
 </body>
