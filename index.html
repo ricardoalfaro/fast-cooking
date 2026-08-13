@@ -7,16 +7,16 @@
   
   <!-- PWA Meta Tags -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#8E97FD">
+  <meta name="theme-color" content="#111111">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link class="apple-touch-icon" href="icon.svg" rel="apple-touch-icon">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
 
-  <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -26,12 +26,12 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            sans: ['DM Sans', 'sans-serif'],
             display: ['Outfit', 'sans-serif'],
           },
           colors: {
             moon: {
-              purple: '#8E97FD',
+              purple: '#F47B45',
               purpleLight: '#E6E9FF',
               purpleDark: '#1E2442',
               peach: '#FFAB91',
@@ -40,8 +40,8 @@
               sageLight: '#E8F5E9',
               amber: '#FFCA28',
               amberLight: '#FFF8E1',
-              darkBg: '#0C0F1D',
-              darkCard: '#181C33',
+              darkBg: '#111111',
+              darkCard: '#1A1A1A',
               lightBg: '#FAF9F5',
               lightCard: '#FFFFFF',
             }
@@ -69,7 +69,7 @@
   <style>
     body {
       -webkit-tap-highlight-color: transparent;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'DM Sans', sans-serif;
       transition: background-color 0.35s ease, color 0.35s ease;
     }
     .font-display {
@@ -92,7 +92,7 @@
     .timer-preset:hover { background: rgba(255,255,255,.18); }
     /* Estilos base de temas inspirados en Silent Moon */
     html.dark {
-      background-color: #0C0F1D;
+      background-color: #111111;
       color: #F5F6FA;
     }
     html.light {
@@ -116,7 +116,7 @@
   </div>
 
   <!-- Header Estilo Silent Moon -->
-  <header class="sticky top-0 z-50 bg-white/80 dark:bg-[#0C0F1D]/80 backdrop-blur-xl border-b border-stone-200/50 dark:border-stone-800/50 px-4 pt-[calc(env(safe-area-inset-top)+10px)] pb-3 flex items-center justify-between transition-colors">
+  <header class="sticky top-0 z-50 bg-white/80 dark:bg-[#111111]/90 backdrop-blur-xl border-b border-stone-200/50 dark:border-stone-800/50 px-4 pt-[calc(env(safe-area-inset-top)+10px)] pb-3 flex items-center justify-between transition-colors">
     <div class="flex items-center space-x-2.5 cursor-pointer group" onclick="showHomeScreen()">
       <div class="w-10 h-10 rounded-2xl bg-moon-purple text-white flex items-center justify-center shadow-lg shadow-moon-purple/30 group-active:scale-95 transition-transform">
         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,7 +125,7 @@
       </div>
       <div class="flex flex-col">
         <span class="font-display text-xl font-extrabold tracking-tight text-stone-900 dark:text-white leading-none">Fast<span class="text-moon-purple">Cooking</span></span>
-        <span class="text-[10px] font-semibold text-stone-400 dark:text-stone-500 tracking-wider">GEMINI 3.6 FLASH</span>
+        <span class="text-[10px] font-semibold text-stone-400 dark:text-stone-500 tracking-wider">COCINA RÁPIDA</span>
       </div>
     </div>
     
@@ -224,7 +224,7 @@
       </button>
     </section>
 
-    <!-- 1. PANTALLA DE INICIO (SILENT MOON STYLE DASHBOARD) -->
+    <!-- 1. PANTALLA DE INICIO -->
     <section id="screen-home" class="flex flex-col min-h-[75vh] space-y-7 animate-fadeIn">
       
       <!-- Greeting Header Dinámico (Good Morning / Good Evening) -->
@@ -235,7 +235,7 @@
           </h2>
         </div>
         <p class="text-stone-500 dark:text-stone-400 text-xs sm:text-sm font-medium">
-          ¿Qué quieres cocinar hoy? Gemini buscará la receta oficial en YouTube.
+          Encuentra una receta, guarda tus favoritas y cocina sin perder el ritmo.
         </p>
       </div>
 
@@ -253,86 +253,34 @@
             placeholder="Ej: Pizza, Empanadas de pino, Sopaipillas..." 
             autocomplete="off"
             required
-            class="w-full h-14 pl-12 pr-28 rounded-full bg-white dark:bg-[#181C33] border border-stone-200 dark:border-stone-800 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-stone-500 text-sm sm:text-base focus:outline-none focus:border-moon-purple focus:ring-4 focus:ring-moon-purple/20 transition-all shadow-md dark:shadow-none"
+            class="w-full h-14 pl-12 pr-28 rounded-2xl bg-white dark:bg-[#1A1A1A] border border-stone-200 dark:border-stone-800 text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-stone-500 text-sm sm:text-base focus:outline-none focus:border-moon-purple focus:ring-4 focus:ring-moon-purple/20 transition-all shadow-md dark:shadow-none"
           />
           <button 
             type="submit" 
-            class="absolute right-2 top-2 bottom-2 px-5 rounded-full bg-moon-purple hover:bg-moon-purple/90 text-white font-bold text-xs sm:text-sm flex items-center justify-center active:scale-95 transition-all shadow-md shadow-moon-purple/30"
+            class="absolute right-2 top-2 bottom-2 px-5 rounded-xl bg-moon-purple hover:bg-moon-purple/90 text-white font-bold text-xs sm:text-sm flex items-center justify-center active:scale-95 transition-all shadow-md shadow-moon-purple/30"
           >
             Buscar
           </button>
         </div>
       </form>
 
-      <!-- GRID DE CATEGORÍAS EN TONOS PASTEL (SILENT MOON DESIGN SYSTEM) -->
-      <div class="space-y-3">
+      <!-- ÚLTIMA RECETA BUSCADA -->
+      <section id="last-recipe-section" class="hidden space-y-3" aria-labelledby="last-recipe-label">
         <div class="flex items-center justify-between px-1">
-          <span class="text-xs font-extrabold uppercase tracking-wider text-stone-400 dark:text-stone-500">Categorías rápidas</span>
-          <span class="text-[11px] font-semibold text-moon-purple">Álvaro Barrientos</span>
+          <span id="last-recipe-label" class="text-[11px] font-extrabold uppercase tracking-[0.16em] text-moon-purple">Última búsqueda</span>
+          <span class="text-[11px] font-semibold text-stone-400">Ábrela y sigue cocinando</span>
         </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <!-- Card 1: Pizzas & Masas (Pastel Peach) -->
-          <div 
-            onclick="quickSearch('pizza')"
-            class="group p-4 rounded-[28px] bg-[#FFEBE6] dark:bg-[#251A22] border border-orange-200/60 dark:border-orange-500/20 cursor-pointer active:scale-95 transition-all flex flex-col justify-between h-32 relative overflow-hidden"
-          >
-            <div class="flex justify-between items-start">
-              <span class="text-2xl">🍕</span>
-              <span class="px-2.5 py-1 rounded-full bg-white/80 dark:bg-stone-900/80 text-[10px] font-extrabold text-orange-600 dark:text-orange-300 uppercase tracking-wider">Masa</span>
-            </div>
-            <div>
-              <h4 class="font-display font-extrabold text-base text-stone-900 dark:text-white leading-tight">Pizza Italiana</h4>
-              <p class="text-[11px] text-stone-600 dark:text-stone-400 font-medium pt-0.5">Receta crujiente</p>
-            </div>
+        <button id="last-recipe-card" type="button" class="relative block h-52 w-full overflow-hidden rounded-[28px] bg-[#1A1A1A] text-left shadow-xl active:scale-[0.98] transition-transform">
+          <img id="last-recipe-image" class="absolute inset-0 h-full w-full object-cover" alt="" />
+          <div class="absolute inset-0 bg-gradient-to-r from-black/95 via-black/60 to-black/15"></div>
+          <div class="relative flex h-full w-[68%] flex-col justify-end p-5">
+            <span class="mb-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-moon-purple">Receta destacada</span>
+            <h3 id="last-recipe-title" class="font-display text-2xl font-extrabold leading-[1.02] text-white"></h3>
+            <p id="last-recipe-meta" class="mt-2 text-xs font-medium text-stone-300"></p>
+            <span class="mt-4 inline-flex w-fit items-center rounded-xl bg-moon-purple px-3 py-2 text-[11px] font-bold text-white">Abrir receta →</span>
           </div>
-
-          <!-- Card 2: Empanadas (Pastel Periwinkle) -->
-          <div 
-            onclick="quickSearch('empanadas de pino')"
-            class="group p-4 rounded-[28px] bg-[#E8EAFF] dark:bg-[#1C203B] border border-indigo-200/60 dark:border-indigo-500/20 cursor-pointer active:scale-95 transition-all flex flex-col justify-between h-32 relative overflow-hidden"
-          >
-            <div class="flex justify-between items-start">
-              <span class="text-2xl">🥟</span>
-              <span class="px-2.5 py-1 rounded-full bg-white/80 dark:bg-stone-900/80 text-[10px] font-extrabold text-moon-purple uppercase tracking-wider">Clásico</span>
-            </div>
-            <div>
-              <h4 class="font-display font-extrabold text-base text-stone-900 dark:text-white leading-tight">Empanadas Pino</h4>
-              <p class="text-[11px] text-stone-600 dark:text-stone-400 font-medium pt-0.5">Al horno chileno</p>
-            </div>
-          </div>
-
-          <!-- Card 3: Legumbres & Fit (Pastel Sage Green) -->
-          <div 
-            onclick="quickSearch('puré de garbanzos')"
-            class="group p-4 rounded-[28px] bg-[#E8F5E9] dark:bg-[#182822] border border-emerald-200/60 dark:border-emerald-500/20 cursor-pointer active:scale-95 transition-all flex flex-col justify-between h-32 relative overflow-hidden"
-          >
-            <div class="flex justify-between items-start">
-              <span class="text-2xl">🧆</span>
-              <span class="px-2.5 py-1 rounded-full bg-white/80 dark:bg-stone-900/80 text-[10px] font-extrabold text-emerald-600 dark:text-emerald-300 uppercase tracking-wider">Sano</span>
-            </div>
-            <div>
-              <h4 class="font-display font-extrabold text-base text-stone-900 dark:text-white leading-tight">Puré Garbanzos</h4>
-              <p class="text-[11px] text-stone-600 dark:text-stone-400 font-medium pt-0.5">Hummus suave</p>
-            </div>
-          </div>
-
-          <!-- Card 4: Sopas & Guisos (Pastel Warm Amber) -->
-          <div 
-            onclick="quickSearch('cazuela de ave')"
-            class="group p-4 rounded-[28px] bg-[#FFF8E1] dark:bg-[#2A261A] border border-amber-200/60 dark:border-amber-500/20 cursor-pointer active:scale-95 transition-all flex flex-col justify-between h-32 relative overflow-hidden"
-          >
-            <div class="flex justify-between items-start">
-              <span class="text-2xl">🍲</span>
-              <span class="px-2.5 py-1 rounded-full bg-white/80 dark:bg-stone-900/80 text-[10px] font-extrabold text-amber-700 dark:text-amber-300 uppercase tracking-wider">Caliente</span>
-            </div>
-            <div>
-              <h4 class="font-display font-extrabold text-base text-stone-900 dark:text-white leading-tight">Cazuela de Ave</h4>
-              <p class="text-[11px] text-stone-600 dark:text-stone-400 font-medium pt-0.5">Sabor hogareño</p>
-            </div>
-          </div>
-        </div>
-      </div>
+        </button>
+      </section>
 
       <!-- BÚSQUEDAS RECIENTES -->
       <section id="recent-searches-section" class="hidden w-full space-y-3 pt-1" aria-labelledby="recent-searches-title">
@@ -821,8 +769,8 @@
             class="flex items-center justify-between p-3.5 rounded-2xl bg-white dark:bg-[#181C33] border border-stone-200/80 dark:border-stone-800 hover:border-moon-purple/50 cursor-pointer active:scale-[0.98] transition-all shadow-sm group"
           >
             <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 rounded-2xl bg-moon-purple/10 text-moon-purple flex items-center justify-center text-lg font-bold">
-                🍳
+              <div class="w-10 h-10 rounded-2xl bg-stone-800 overflow-hidden shrink-0">
+                ${getRecipeImage(recipe) ? `<img src="${getRecipeImage(recipe)}" alt="" class="w-full h-full object-cover" />` : '<span class="w-full h-full flex items-center justify-center text-moon-purple">🍳</span>'}
               </div>
               <div class="text-left">
                 <h4 class="font-display font-extrabold text-sm text-stone-900 dark:text-stone-100 group-hover:text-moon-purple transition-colors">
@@ -865,7 +813,7 @@
         return `
           <button type="button" onclick="renderRecipeDirectly(decodeURIComponent('${encodedKey}'))" class="flex items-center justify-between p-3.5 rounded-2xl bg-white dark:bg-[#181C33] border border-stone-200/80 dark:border-stone-800 hover:border-moon-purple/50 text-left active:scale-[0.98] transition-all shadow-sm group">
             <span class="flex min-w-0 items-center space-x-3">
-              <span class="w-10 h-10 rounded-2xl bg-moon-purple/10 text-moon-purple flex items-center justify-center text-lg shrink-0">🕘</span>
+              <span class="w-10 h-10 rounded-2xl bg-stone-800 overflow-hidden shrink-0">${getRecipeImage(recipe) ? `<img src="${getRecipeImage(recipe)}" alt="" class="w-full h-full object-cover" />` : '<span class="w-full h-full flex items-center justify-center text-moon-purple">🕘</span>'}</span>
               <span class="min-w-0">
                 <span class="block truncate font-display font-extrabold text-sm text-stone-900 dark:text-stone-100 group-hover:text-moon-purple transition-colors">${escapeHtml(recipe.title)}</span>
                 <span class="block truncate text-[11px] text-stone-400 font-medium">${recentSearchLabel(item.consultedAt)}</span>
@@ -941,6 +889,77 @@
         }
       }
       return "gemini-3.6-flash"; 
+    }
+
+    async function generateRecipeCover(recipe) {
+      const apiKey = getApiKey();
+      if (!apiKey || recipe.coverImage || recipe.coverImageFailed) return recipe.coverImage || '';
+      const imageModels = ['gemini-3.1-flash-image', 'gemini-2.5-flash-image'];
+      const prompt = `Food editorial photograph for a premium dark-mode cooking app. Dish: "${recipe.title}". Close three-quarter angle, plated Chilean home-style food, rich warm natural light, charcoal black background, subtle orange highlights, appetizing texture, no people, no utensils covering the food, no text, no logo, no watermark. Landscape 16:9 composition with the food weighted to the right and calm dark negative space on the left.`;
+
+      for (const model of imageModels) {
+        try {
+          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: { responseModalities: ['IMAGE'] }
+            })
+          });
+          if (!response.ok) continue;
+          const payload = await response.json();
+          const imagePart = payload.candidates?.[0]?.content?.parts?.find(part => part.inlineData?.data);
+          if (!imagePart) continue;
+          const coverImage = `data:${imagePart.inlineData.mimeType || 'image/png'};base64,${imagePart.inlineData.data}`;
+          const updatedRecipe = { ...recipe, coverImage, coverImageGeneratedAt: Date.now() };
+          saveCustomRecipe(updatedRecipe);
+          if (currentRecipeKey === recipe.key) {
+            currentRecipe = updatedRecipe;
+            const thumbnail = document.getElementById('recipe-thumbnail');
+            const thumbnailImg = document.getElementById('recipe-thumbnail-img');
+            thumbnailImg.src = coverImage;
+            thumbnail.classList.remove('hidden');
+          }
+          renderLastRecipeCard();
+          return coverImage;
+        } catch (error) {
+          console.warn(`No se pudo crear la portada con ${model}.`, error);
+        }
+      }
+      saveCustomRecipe({ ...recipe, coverImageFailed: true });
+      return '';
+    }
+
+    function getRecipeImage(recipe) {
+      if (recipe?.coverImage) return recipe.coverImage;
+      const videoId = extractYoutubeVideoId(recipe?.baseUrl || '');
+      return videoId ? `https://img.youtube.com/vi/${encodeURIComponent(videoId)}/mqdefault.jpg` : '';
+    }
+
+    function renderLastRecipeCard() {
+      const section = document.getElementById('last-recipe-section');
+      const latest = cleanRecipeHistory()
+        .map(item => getCustomStoredRecipes()[item.key])
+        .find(Boolean);
+      if (!latest) {
+        section.classList.add('hidden');
+        return;
+      }
+      const card = document.getElementById('last-recipe-card');
+      const image = document.getElementById('last-recipe-image');
+      const imageUrl = getRecipeImage(latest);
+      document.getElementById('last-recipe-title').textContent = latest.title || 'Última receta';
+      document.getElementById('last-recipe-meta').textContent = latest.author ? `Por ${latest.author}` : 'Tu última receta consultada';
+      card.onclick = () => renderRecipeDirectly(latest.key);
+      if (imageUrl) {
+        image.src = imageUrl;
+        image.classList.remove('hidden');
+      } else {
+        image.removeAttribute('src');
+        image.classList.add('hidden');
+      }
+      section.classList.remove('hidden');
     }
 
     // LLAMADA A LA API DE GEMINI CON RETRY AUTO-HEALING Y GROUNDING
@@ -1240,6 +1259,10 @@ REGLAS CRÍTICAS:
       currentRecipeKey = data.key;
       currentRecipe = data;
       currentServings = Math.max(1, Number(data.servings) || 4);
+      renderLastRecipeCard();
+      if (!data.coverImage && !data.coverImageFailed) {
+        generateRecipeCover(data);
+      }
 
       const knownFakeIds = ["wX-y0Y1vJ4E", "VIDEO_ID", "ID_REAL", "[VIDEO_ID]", "abcdefghijk", "12345678901"];
       let safeBaseUrl = data.baseUrl || "";
@@ -1252,11 +1275,11 @@ REGLAS CRÍTICAS:
       document.getElementById('recipe-author-text').textContent = `Por ${data.author || 'Álvaro Barrientos Montero'}`;
       document.getElementById('main-yt-btn').href = safeBaseUrl;
       document.getElementById('servings-display').textContent = `${currentServings} ${currentServings === 1 ? 'porción' : 'porciones'}`;
-      const videoId = extractYoutubeVideoId(safeBaseUrl);
       const thumbnail = document.getElementById('recipe-thumbnail');
       const thumbnailImg = document.getElementById('recipe-thumbnail-img');
-      if (videoId) {
-        thumbnailImg.src = `https://img.youtube.com/vi/${encodeURIComponent(videoId)}/mqdefault.jpg`;
+      const recipeImage = getRecipeImage(data);
+      if (recipeImage) {
+        thumbnailImg.src = recipeImage;
         thumbnail.classList.remove('hidden');
       } else {
         thumbnailImg.removeAttribute('src');
@@ -1321,6 +1344,7 @@ REGLAS CRÍTICAS:
       document.getElementById('screen-home').classList.remove('hidden');
       document.getElementById('timer-widget').classList.add('hidden');
       updateDynamicGreeting();
+      renderLastRecipeCard();
       renderFavoritesList();
       renderRecentSearches();
       document.getElementById('search-input').focus();
@@ -1498,9 +1522,10 @@ REGLAS CRÍTICAS:
     });
 
     document.addEventListener('DOMContentLoaded', () => {
-      initTheme();
+      applyTheme('dark');
       cleanRecipeHistory();
       updateDynamicGreeting();
+      renderLastRecipeCard();
       renderFavoritesList();
       renderRecentSearches();
     });
