@@ -646,6 +646,15 @@
       return String(value ?? '').replace(/[&<>'\"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
     }
 
+    function formatRecipeTitle(title) {
+      const clean = String(title || 'Receta sin nombre').trim().replace(/\s+/g, ' ');
+      if (!clean) return 'Receta sin nombre';
+      const normalized = clean === clean.toUpperCase() || clean === clean.toLowerCase()
+        ? clean.toLocaleLowerCase('es-CL').replace(/(^|[\s\-–—/])([\p{L}])/gu, (_, prefix, letter) => `${prefix}${letter.toLocaleUpperCase('es-CL')}`)
+        : clean;
+      return normalized.length > 52 ? `${normalized.slice(0, 49).trimEnd()}…` : normalized;
+    }
+
     function isFavorite(key) {
       return getFavorites().includes(key);
     }
@@ -704,10 +713,10 @@
         const encodedKey = encodeURIComponent(key);
         return `
           <button type="button" onclick="renderRecipeDirectly(decodeURIComponent('${encodedKey}'))" class="group w-32 shrink-0 snap-start text-left active:scale-[0.97] transition-transform">
-            <span class="block aspect-square overflow-hidden rounded-2xl bg-stone-800">
+            <span class="relative block aspect-square overflow-hidden rounded-2xl bg-stone-800">
               <img src="${getRecipeImage(recipe)}" onerror="this.onerror=null;this.src='public/recipe-fallback.png'" alt="" class="h-full w-full object-cover" />
+              <span class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/65 to-transparent px-3 pb-3 pt-8 font-display text-sm font-extrabold leading-tight text-white">${escapeHtml(formatRecipeTitle(recipe.title))}</span>
             </span>
-            <span class="mt-2 block line-clamp-2 font-display text-sm font-extrabold leading-tight text-stone-100 group-hover:text-moon-purple transition-colors">${escapeHtml(recipe.title)}</span>
           </button>
         `;
       }).join('');
@@ -737,8 +746,7 @@
         const encodedKey = encodeURIComponent(item.key);
         return `
           <button type="button" onclick="renderRecipeDirectly(decodeURIComponent('${encodedKey}'))" class="group w-32 shrink-0 snap-start text-left active:scale-[0.97] transition-transform">
-            <span class="block aspect-square overflow-hidden rounded-2xl bg-stone-800"><img src="${getRecipeImage(recipe)}" onerror="this.onerror=null;this.src='public/recipe-fallback.png'" alt="" class="h-full w-full object-cover" /></span>
-            <span class="mt-2 block line-clamp-2 font-display text-sm font-extrabold leading-tight text-stone-100 group-hover:text-moon-purple transition-colors">${escapeHtml(recipe.title)}</span>
+            <span class="relative block aspect-square overflow-hidden rounded-2xl bg-stone-800"><img src="${getRecipeImage(recipe)}" onerror="this.onerror=null;this.src='public/recipe-fallback.png'" alt="" class="h-full w-full object-cover" /><span class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/65 to-transparent px-3 pb-3 pt-8 font-display text-sm font-extrabold leading-tight text-white">${escapeHtml(formatRecipeTitle(recipe.title))}</span></span>
           </button>
         `;
       }).join('');

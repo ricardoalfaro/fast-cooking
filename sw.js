@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fastcooking-v9';
+const CACHE_NAME = 'fastcooking-v10';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
