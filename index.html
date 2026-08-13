@@ -10,8 +10,8 @@
   <meta name="theme-color" content="#111111">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link class="apple-touch-icon" href="icon.svg" rel="apple-touch-icon">
-  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link class="apple-touch-icon" href="public/app-icon-pot.png" rel="apple-touch-icon">
+  <link rel="icon" type="image/png" href="public/app-icon-pot.png">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -90,14 +90,9 @@
     }
     .timer-preset:active { transform: scale(.95); }
     .timer-preset:hover { background: rgba(255,255,255,.18); }
-    /* Estilos base de temas inspirados en Silent Moon */
     html.dark {
       background-color: #111111;
       color: #F5F6FA;
-    }
-    html.light {
-      background-color: #FAF9F5;
-      color: #1A1D2E;
     }
   </style>
 </head>
@@ -115,43 +110,26 @@
     </div>
   </div>
 
-  <!-- Header Estilo Silent Moon -->
-  <header class="sticky top-0 z-50 bg-white/80 dark:bg-[#111111]/90 backdrop-blur-xl border-b border-stone-200/50 dark:border-stone-800/50 px-4 pt-[calc(env(safe-area-inset-top)+10px)] pb-3 flex items-center justify-between transition-colors">
+  <header class="sticky top-0 z-50 bg-[#111111]/95 backdrop-blur-xl border-b border-stone-800/70 px-3 pt-[calc(env(safe-area-inset-top)+8px)] pb-2.5 flex items-center justify-between transition-colors">
     <div class="flex items-center space-x-2.5 cursor-pointer group" onclick="showHomeScreen()">
-      <div class="w-10 h-10 rounded-2xl bg-moon-purple text-white flex items-center justify-center shadow-lg shadow-moon-purple/30 group-active:scale-95 transition-transform">
-        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
-      </div>
+      <img src="public/app-icon-pot.png" alt="" class="w-10 h-10 rounded-2xl object-cover bg-[#1A1A1A] shadow-lg shadow-moon-purple/20 group-active:scale-95 transition-transform" />
       <div class="flex flex-col">
-        <span class="font-display text-xl font-extrabold tracking-tight text-stone-900 dark:text-white leading-none">Fast<span class="text-moon-purple">Cooking</span></span>
-        <span class="text-[10px] font-semibold text-stone-400 dark:text-stone-500 tracking-wider">COCINA RÁPIDA</span>
+        <span class="font-display text-xl font-extrabold tracking-tight text-white leading-none">Fast<span class="text-moon-purple">Cooking</span></span>
       </div>
     </div>
-    
-    <div class="flex items-center space-x-2">
-      <!-- Theme Switcher Pill -->
-      <button id="theme-toggle-btn" onclick="toggleTheme()" class="h-9 px-3 rounded-full border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-[#181C33] text-stone-700 dark:text-amber-300 text-xs font-bold flex items-center space-x-1.5 active:scale-95 transition-all shadow-sm">
-        <span id="theme-icon">🌙</span>
-        <span id="theme-text" class="hidden xs:inline text-[11px] font-semibold">Tema</span>
+    <div class="relative">
+      <button type="button" onclick="toggleQuickMenu()" aria-label="Abrir menú" aria-expanded="false" id="quick-menu-button" class="flex h-10 w-10 items-center justify-center rounded-xl text-white hover:bg-white/10 active:scale-95 transition">
+        <span class="text-xl leading-none">☰</span>
       </button>
-
-      <!-- API Key Setup Button -->
-      <button onclick="openApiKeyModal()" class="h-9 px-3 rounded-full border border-moon-purple/30 bg-moon-purple/10 text-moon-purple text-xs font-bold flex items-center space-x-1 active:scale-95 transition-all">
-        <span>🔑</span>
-        <span class="hidden xs:inline">API Key</span>
-      </button>
-
-      <!-- Wake Lock Toggle -->
-      <button id="wakelock-btn" onclick="toggleWakeLock()" class="h-9 px-3 rounded-full border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-[#181C33] text-stone-700 dark:text-stone-300 text-xs font-semibold flex items-center space-x-1.5 active:scale-95 transition-all shadow-sm">
-        <span id="wakelock-icon" class="w-2 h-2 rounded-full bg-stone-400 dark:bg-stone-500"></span>
-        <span id="wakelock-text" class="hidden xs:inline">Pantalla On</span>
-      </button>
+      <div id="quick-menu" class="hidden absolute right-0 top-12 w-52 rounded-2xl border border-stone-700 bg-[#1A1A1A] p-2 shadow-2xl">
+        <button type="button" onclick="openApiKeyModal(); closeQuickMenu()" class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold text-stone-200 hover:bg-white/10"><span>🔑</span><span>API token</span></button>
+        <button type="button" onclick="toggleWakeLock(); closeQuickMenu()" class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold text-stone-200 hover:bg-white/10"><span id="wakelock-icon" class="w-2 h-2 rounded-full bg-stone-500"></span><span id="wakelock-text">Mantener encendida</span></button>
+      </div>
     </div>
   </header>
 
   <!-- MAIN CONTAINER -->
-  <main class="flex-1 max-w-md w-full mx-auto px-4 py-6 flex flex-col justify-center">
+  <main class="flex-1 max-w-md w-full mx-auto px-3 py-4 flex flex-col justify-center">
 
     <!-- PANTALLA DE CARGA (ULTRA MINIMALISTA NOUN PROJECT) -->
     <section id="screen-loading" class="hidden flex flex-col items-center justify-center min-h-[65vh] text-center space-y-8 animate-fadeIn">
@@ -225,18 +203,15 @@
     </section>
 
     <!-- 1. PANTALLA DE INICIO -->
-    <section id="screen-home" class="flex flex-col min-h-[75vh] space-y-7 animate-fadeIn">
+    <section id="screen-home" class="flex flex-col min-h-[75vh] space-y-5 animate-fadeIn">
       
       <!-- Greeting Header Dinámico (Good Morning / Good Evening) -->
-      <div class="space-y-2 pt-1 text-left">
+      <div class="pt-1 text-left">
         <div class="flex items-center justify-between">
           <h2 id="greeting-title" class="font-display text-3xl sm:text-4xl font-extrabold text-stone-900 dark:text-white tracking-tight">
-            ¡Buenas tardes, Chef! 🍳
+            ¡Buenas tardes, Ricardo! 🍳
           </h2>
         </div>
-        <p class="text-stone-500 dark:text-stone-400 text-xs sm:text-sm font-medium">
-          Encuentra una receta, guarda tus favoritas y cocina sin perder el ritmo.
-        </p>
       </div>
 
       <!-- Buscador Central Minimalista -->
@@ -492,48 +467,30 @@
       if (!greetingEl) return;
 
       if (hour >= 6 && hour < 13) {
-        greetingEl.textContent = '¡Buenos días, Chef! 🍳';
+        greetingEl.textContent = '¡Buenos días, Ricardo! 🍳';
       } else if (hour >= 13 && hour < 20) {
-        greetingEl.textContent = '¡Buenas tardes, Chef! 🥘';
+        greetingEl.textContent = '¡Buenas tardes, Ricardo! 🥘';
       } else {
-        greetingEl.textContent = '¡Buenas noches, Chef! 🍷';
+        greetingEl.textContent = '¡Buenas noches, Ricardo! 🍷';
       }
     }
 
-    // TEMA LIGHT / DARK MANAGEMENT
-    function initTheme() {
-      const savedTheme = localStorage.getItem('fastcooking_theme');
-      if (savedTheme === 'light' || savedTheme === 'dark') {
-        applyTheme(savedTheme);
-      } else {
-        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        applyTheme(prefersDark ? 'dark' : 'light');
-      }
+    function forceDarkTheme() {
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
     }
 
-    function applyTheme(theme) {
-      const htmlEl = document.documentElement;
-      const themeIcon = document.getElementById('theme-icon');
-      const themeText = document.getElementById('theme-text');
-      
-      if (theme === 'dark') {
-        htmlEl.classList.add('dark');
-        htmlEl.classList.remove('light');
-        if (themeIcon) themeIcon.textContent = '☀️';
-        if (themeText) themeText.textContent = 'Modo Claro';
-      } else {
-        htmlEl.classList.add('light');
-        htmlEl.classList.remove('dark');
-        if (themeIcon) themeIcon.textContent = '🌙';
-        if (themeText) themeText.textContent = 'Modo Oscuro';
-      }
-      localStorage.setItem('fastcooking_theme', theme);
+    function toggleQuickMenu() {
+      const menu = document.getElementById('quick-menu');
+      const button = document.getElementById('quick-menu-button');
+      const willOpen = menu.classList.contains('hidden');
+      menu.classList.toggle('hidden', !willOpen);
+      button.setAttribute('aria-expanded', String(willOpen));
     }
 
-    function toggleTheme() {
-      const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      applyTheme(newTheme);
+    function closeQuickMenu() {
+      document.getElementById('quick-menu').classList.add('hidden');
+      document.getElementById('quick-menu-button').setAttribute('aria-expanded', 'false');
     }
 
     // LOCAL STORAGE CONFIGS
@@ -750,7 +707,7 @@
         return `
           <div 
             onclick="renderRecipeDirectly(decodeURIComponent('${encodedKey}'))"
-            class="flex items-center justify-between p-3.5 rounded-2xl bg-white dark:bg-[#181C33] border border-stone-200/80 dark:border-stone-800 hover:border-moon-purple/50 cursor-pointer active:scale-[0.98] transition-all shadow-sm group"
+            class="flex items-center justify-between py-2.5 cursor-pointer active:scale-[0.98] transition-all group"
           >
             <div class="flex items-center space-x-3">
               <div class="w-10 h-10 rounded-2xl bg-stone-800 overflow-hidden shrink-0">
@@ -795,7 +752,7 @@
         const recipe = recipes[item.key];
         const encodedKey = encodeURIComponent(item.key);
         return `
-          <button type="button" onclick="renderRecipeDirectly(decodeURIComponent('${encodedKey}'))" class="flex items-center justify-between p-3.5 rounded-2xl bg-white dark:bg-[#181C33] border border-stone-200/80 dark:border-stone-800 hover:border-moon-purple/50 text-left active:scale-[0.98] transition-all shadow-sm group">
+          <button type="button" onclick="renderRecipeDirectly(decodeURIComponent('${encodedKey}'))" class="flex items-center justify-between py-2.5 text-left active:scale-[0.98] transition-all group">
             <span class="flex min-w-0 items-center space-x-3">
               <span class="w-10 h-10 rounded-2xl bg-stone-800 overflow-hidden shrink-0"><img src="${getRecipeImage(recipe)}" onerror="this.onerror=null;this.src='public/recipe-fallback.png'" alt="" class="w-full h-full object-cover" /></span>
               <span class="min-w-0">
@@ -1451,11 +1408,11 @@ REGLAS CRÍTICAS:
           await wakeLock.release();
           wakeLock = null;
           icon.className = "w-2 h-2 rounded-full bg-stone-400 dark:bg-stone-500";
-          text.textContent = "Pantalla On";
+          text.textContent = "Mantener encendida";
         } else {
           wakeLock = await navigator.wakeLock.request('screen');
           icon.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
-          text.textContent = "Activo";
+          text.textContent = "Pantalla encendida";
         }
       } catch (err) {
         console.error(`Wake Lock Error: ${err.message}`);
@@ -1537,7 +1494,7 @@ REGLAS CRÍTICAS:
     });
 
     document.addEventListener('DOMContentLoaded', () => {
-      applyTheme('dark');
+      forceDarkTheme();
       cleanRecipeHistory();
       updateDynamicGreeting();
       renderLastRecipeCard();

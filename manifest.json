@@ -4,14 +4,14 @@
   "description": "Recetas optimizadas con tips directo a YouTube para cocinar al instante.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#fafafa",
-  "theme_color": "#ea580c",
+  "background_color": "#111111",
+  "theme_color": "#111111",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "icon.svg",
+      "src": "public/app-icon-pot.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
